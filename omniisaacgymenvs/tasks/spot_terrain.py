@@ -206,14 +206,15 @@ class SpotTerrainTask(RLTask):
         self.terrain_types = torch.randint(0, self._task_cfg["env"]["terrain"]["numTerrains"], (self.num_envs,), device=self.device)
         self._create_trimesh()
         self.terrain_origins = torch.from_numpy(self.terrain.env_origins).to(self.device).to(torch.float)
-            
+# Local Machine path
+# E:/Bored Engineer Github/Bored Engineer/Robots_for_Omniverse/openUSD_assets/spot/            
     def get_anymal(self):
         self.base_init_state = torch.tensor(self.base_init_state, dtype=torch.float, device=self.device, requires_grad=False)
-        anymal_translation = torch.tensor([0.0, 0.0, 0.66])
+        anymal_translation = torch.tensor([0.0, 0.0, 0.7])
         anymal_orientation = torch.tensor([1.0, 0.0, 0.0, 0.0])
         anymal = Spot(prim_path=self.default_zero_env_path + "/spot", 
                         name="spot",
-                        usd_path="<more path here>/openUSD_assets/spot/spot.usd",
+                        usd_path="E:\Bored Engineer Github\Bored Engineer\Robots_for_Omniverse\openUSD_assets\spot\spot.usd",
                         translation=anymal_translation, 
                         orientation=anymal_orientation,)
         self._sim_config.apply_articulation_settings("spot", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("spot"))

@@ -81,7 +81,7 @@ class SpotTask(RLTask):
         state = pos + rot + v_lin + v_ang
 
         self.base_init_state = state
-
+        # print(self.base_init_state)
         # default joint positions
         self.named_default_joint_angles = self._task_cfg["env"]["defaultJointAngles"]
 
@@ -96,7 +96,7 @@ class SpotTask(RLTask):
             self.rew_scales[key] *= self.dt
 
         self._num_envs = self._task_cfg["env"]["numEnvs"]
-        self._anymal_translation = torch.tensor([0.0, 0.0, 0.62])
+        self._anymal_translation = torch.tensor([0.0, 0.0, 1])
         self._env_spacing = self._task_cfg["env"]["envSpacing"]
         self._num_observations = 48
         self._num_actions = 12
@@ -107,7 +107,7 @@ class SpotTask(RLTask):
     def set_up_scene(self, scene) -> None:
         self.get_anymal()
         super().set_up_scene(scene)
-        self._anymals = SpotView(prim_paths_expr="/World/envs/.*/anymal", name="anymalview")
+        self._anymals = SpotView(prim_paths_expr="/World/envs/.*/spot", name="spot_view")
         scene.add(self._anymals)
         scene.add(self._anymals._knees)
         scene.add(self._anymals._base)
@@ -115,8 +115,11 @@ class SpotTask(RLTask):
         return
 
     def get_anymal(self):
-        anymal = Spot(prim_path=self.default_zero_env_path + "/anymal", name="Anymal", translation=self._anymal_translation)
-        self._sim_config.apply_articulation_settings("Anymal", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("Anymal"))
+        anymal = Spot(prim_path=self.default_zero_env_path + "/spot", 
+                      name="Spot", 
+                      usd_path="E:\Bored Engineer Github\Bored Engineer\Robots_for_Omniverse\openUSD_assets\spot\spot.usd",
+                      translation=self._anymal_translation)
+        self._sim_config.apply_articulation_settings("Spot", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("Spot"))
 
         # Configure joint properties
         joint_paths = []

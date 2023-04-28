@@ -1,9 +1,9 @@
 name: SpotTerrain
 
 physics_engine: ${..physics_engine}
-
+# ${resolve_default:2048,${...num_envs}} The original number is 2048
 env:
-  numEnvs: ${resolve_default:2048,${...num_envs}}
+  numEnvs: ${resolve_default:4,${...num_envs}}
   numObservations: 188
   numActions: 12
   envSpacing: 3.  # [m]
@@ -25,7 +25,7 @@ env:
     slopeTreshold: 0.5
 
   baseInitState:
-    pos: [0.0, 0.0, 0.62] # x,y,z [m]
+    pos: [0.0, 0.0, 0.7] # x,y,z [m]
     rot: [1.0, 0.0, 0.0, 0.0] # w,x,y,z [quat]
     vLinear: [0.0, 0.0, 0.0]  # x,y,z [m/s]
     vAngular: [0.0, 0.0, 0.0]  # x,y,z [rad/s]
