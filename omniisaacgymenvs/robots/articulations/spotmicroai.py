@@ -39,11 +39,11 @@ import torch
 
 from pxr import PhysxSchema
 
-class Spotmicro(Robot):
+class Spotmicroai(Robot):
     def __init__(
         self,
         prim_path: str,
-        name: Optional[str] = "Anymal",
+        name: Optional[str] = "Spotmicroai",
         usd_path: Optional[str] = None,
         translation: Optional[np.ndarray] = None,
         orientation: Optional[np.ndarray] = None,

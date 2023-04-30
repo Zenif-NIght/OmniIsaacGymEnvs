@@ -27,8 +27,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from omniisaacgymenvs.tasks.base.rl_task import RLTask
-from omniisaacgymenvs.robots.articulations.spotmicro import Spotmicro
-from omniisaacgymenvs.robots.articulations.views.spotmicro_view import SpotmicroView
+from omniisaacgymenvs.robots.articulations.spotmicroai import Spotmicroai
+from omniisaacgymenvs.robots.articulations.views.spotmicroai_view import SpotmicroaiView
 from omniisaacgymenvs.tasks.utils.anymal_terrain_generator import *
 from omniisaacgymenvs.utils.terrain_utils.terrain_utils import *
 
@@ -44,7 +44,7 @@ import math
 from pxr import UsdPhysics, UsdLux
 
 
-class SpotmicroTerrainTask(RLTask):
+class SpotmicroaiTerrainTask(RLTask):
     def __init__(
         self,
         name,
@@ -194,8 +194,8 @@ class SpotmicroTerrainTask(RLTask):
         self.get_terrain()
         self.get_anymal()
         super().set_up_scene(scene)
-        self._anymals = SpotmicroView(prim_paths_expr="/World/envs/.*/spotmicroai", 
-                                      name="spotmicro_view", 
+        self._anymals = SpotmicroaiView(prim_paths_expr="/World/envs/.*/spotmicroai", 
+                                      name="spotmicroai_view", 
                                       track_contact_forces=True)
         scene.add(self._anymals)
         scene.add(self._anymals._knees)
@@ -213,11 +213,12 @@ class SpotmicroTerrainTask(RLTask):
         self.base_init_state = torch.tensor(self.base_init_state, dtype=torch.float, device=self.device, requires_grad=False)
         anymal_translation = torch.tensor([0.0, 0.0, 0.66])
         anymal_orientation = torch.tensor([1.0, 0.0, 0.0, 0.0])
-        anymal = Spotmicro(prim_path=self.default_zero_env_path + "/spotmicroai", 
-                        name="spotmicro",
+        anymal = Spotmicroai(prim_path=self.default_zero_env_path + "/spotmicroai", 
+                        name="spotmicroai",
+                        usd_path="E:\Bored Engineer Github\Bored Engineer\Robots_for_Omniverse\openUSD_assets\spotmicroai\spotmicroai.usd",
                         translation=anymal_translation, 
                         orientation=anymal_orientation,)
-        self._sim_config.apply_articulation_settings("spotmicro", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("spotmicro"))
+        self._sim_config.apply_articulation_settings("spotmicroai", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("spotmicroai"))
         anymal.set_anymal_properties(self._stage, anymal.prim)
         anymal.prepare_contacts(self._stage, anymal.prim)
 

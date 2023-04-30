@@ -49,8 +49,8 @@ def initialize_task(config, env, init_sim=True):
     from omniisaacgymenvs.tasks.spot import SpotTask
     from omniisaacgymenvs.tasks.spot_terrain import SpotTerrainTask
     # Spotmicro
-    from omniisaacgymenvs.tasks.spotmicro import SpotmicroTask
-    from omniisaacgymenvs.tasks.spotmicro_terrain import SpotmicroTerrainTask
+    from omniisaacgymenvs.tasks.spotmicroai import SpotmicroaiTask
+    from omniisaacgymenvs.tasks.spotmicroai_terrain import SpotmicroaiTerrainTask
 
     # Mappings from strings to environments
     task_map = {
@@ -71,8 +71,8 @@ def initialize_task(config, env, init_sim=True):
         "ShadowHandOpenAI_LSTM": ShadowHandTask,
         "Spot": SpotTask,
         "SpotTerrain": SpotTerrainTask,
-        "Spotmicro": SpotmicroTask,
-        "SpotmicroTerrain": SpotmicroTerrainTask
+        "Spotmicroai": SpotmicroaiTask,
+        "SpotmicroaiTerrain": SpotmicroaiTerrainTask
     }
 
     cfg = sim_config.config

@@ -40,7 +40,7 @@ from omniisaacgymenvs.utils.domain_randomization.randomize import Randomizer
 import omni.kit
 from omni.kit.viewport.utility.camera_state import ViewportCameraState
 from omni.kit.viewport.utility import get_viewport_from_window_name
-from pxr import Gf
+from pxr import Gf, Sdf
 
 import omni.kit.commands
 
@@ -126,10 +126,11 @@ class RLTask(BaseTask):
         super().set_up_scene(scene)
 
         collision_filter_global_paths = list()
+        # This is supposed to Add a simple Flat Ground Plane
         if self._sim_config.task_config["sim"].get("add_ground_plane", True):
-            # Duct tape Add Ground Plane
             # Get stage handle
             stage = omni.usd.get_context().get_stage()
+            # Duct tape solution 1 - Add a Flat Ground Plane
             omni.kit.commands.execute(
                 "AddGroundPlaneCommand",
                 stage=stage,
@@ -142,6 +143,14 @@ class RLTask(BaseTask):
             self._ground_plane_path = "/World/defaultGroundPlane"
             collision_filter_global_paths.append(self._ground_plane_path)
             scene.add_default_ground_plane(prim_path=self._ground_plane_path)
+            # Duct tape Solution 2 - Add RigidBody to whatever plane is created
+            # Error - everything fly up in a straight line
+            # omni.kit.commands.execute('SetRigidBody',
+            #     path=Sdf.Path(self._ground_plane_path),
+            #     approximationShape='convexHull',
+            #     kinematic=False
+            # )
+
         prim_paths = self._cloner.generate_paths("/World/envs/env", self._num_envs)
         self._env_pos = self._cloner.clone(source_prim_path="/World/envs/env_0", prim_paths=prim_paths, replicate_physics=replicate_physics)
         self._env_pos = torch.tensor(np.array(self._env_pos), device=self._device, dtype=torch.float)

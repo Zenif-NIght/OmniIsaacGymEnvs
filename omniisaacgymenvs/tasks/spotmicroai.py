@@ -27,8 +27,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from omniisaacgymenvs.tasks.base.rl_task import RLTask
-from omniisaacgymenvs.robots.articulations.spotmicro import Spotmicro
-from omniisaacgymenvs.robots.articulations.views.spotmicro_view import SpotmicroView
+from omniisaacgymenvs.robots.articulations.spotmicroai import Spotmicroai
+from omniisaacgymenvs.robots.articulations.views.spotmicroai_view import SpotmicroaiView
 from omniisaacgymenvs.tasks.utils.usd_utils import set_drive
 
 from omni.isaac.core.utils.prims import get_prim_at_path
@@ -40,7 +40,7 @@ import torch
 import math
 
 
-class SpotmicroTask(RLTask):
+class SpotmicroaiTask(RLTask):
     def __init__(
         self,
         name,
@@ -96,7 +96,7 @@ class SpotmicroTask(RLTask):
             self.rew_scales[key] *= self.dt
 
         self._num_envs = self._task_cfg["env"]["numEnvs"]
-        self._anymal_translation = torch.tensor([0.0, 0.0, 0.62])
+        self._anymal_translation = torch.tensor([0.0, 0.0, 0.26])
         self._env_spacing = self._task_cfg["env"]["envSpacing"]
         self._num_observations = 48
         self._num_actions = 12
@@ -107,7 +107,8 @@ class SpotmicroTask(RLTask):
     def set_up_scene(self, scene) -> None:
         self.get_anymal()
         super().set_up_scene(scene)
-        self._anymals = SpotmicroView(prim_paths_expr="/World/envs/.*/spotmicroai", name="spotmicroview")
+        self._anymals = SpotmicroaiView(prim_paths_expr="/World/envs/.*/spotmicroai", 
+                                      name="spotmicroaiview")
         scene.add(self._anymals)
         scene.add(self._anymals._knees)
         scene.add(self._anymals._base)
@@ -115,10 +116,11 @@ class SpotmicroTask(RLTask):
         return
 
     def get_anymal(self):
-        anymal = Spotmicro(prim_path=self.default_zero_env_path + "/spotmicroai", 
-                           name="Spotmicro", 
+        anymal = Spotmicroai(prim_path=self.default_zero_env_path + "/spotmicroai", 
+                           name="Spotmicroai", 
+                           usd_path="E:\Bored Engineer Github\Bored Engineer\Robots_for_Omniverse\openUSD_assets\spotmicroai\spotmicroai.usd",
                            translation=self._anymal_translation)
-        self._sim_config.apply_articulation_settings("Spotmicro", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("Spotmicro"))
+        self._sim_config.apply_articulation_settings("Spotmicroai", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("Spotmicroai"))
 
         # Configure joint properties
         joint_paths = []

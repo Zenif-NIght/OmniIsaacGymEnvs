@@ -26,7 +26,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from omniisaacgymenvs.tasks.anymal_terrain import SpotmicroTerrainTask, wrap_to_pi
+from omniisaacgymenvs.tasks.spotmicroai_terrain import SpotmicroaiTerrainTask, wrap_to_pi
 
 from omni.isaac.core.utils.prims import get_prim_at_path
 from omni.isaac.core.utils.stage import get_current_stage
@@ -45,7 +45,7 @@ from omni.kit.viewport.utility import get_viewport_from_window_name
 from pxr import Sdf
 
 
-class SpotmicroTerrainDemo(SpotmicroTerrainTask):
+class SpotmicroaiTerrainDemo(SpotmicroaiTerrainTask):
     def __init__(
         self,
         name,
