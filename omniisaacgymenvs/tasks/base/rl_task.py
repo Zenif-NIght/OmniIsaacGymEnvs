@@ -42,6 +42,8 @@ from omni.kit.viewport.utility.camera_state import ViewportCameraState
 from omni.kit.viewport.utility import get_viewport_from_window_name
 from pxr import Gf
 
+import omni.kit.commands
+
 class RLTask(BaseTask):
 
     """ This class provides a PyTorch RL-specific interface for setting up RL tasks. 
@@ -125,6 +127,18 @@ class RLTask(BaseTask):
 
         collision_filter_global_paths = list()
         if self._sim_config.task_config["sim"].get("add_ground_plane", True):
+            # Duct tape Add Ground Plane
+            # Get stage handle
+            stage = omni.usd.get_context().get_stage()
+            omni.kit.commands.execute(
+                "AddGroundPlaneCommand",
+                stage=stage,
+                planePath="/groundPlane",
+                axis="Z",
+                size=1500.0,
+                position=Gf.Vec3f(0, 0, -50),
+                color=Gf.Vec3f(0.5),
+            )
             self._ground_plane_path = "/World/defaultGroundPlane"
             collision_filter_global_paths.append(self._ground_plane_path)
             scene.add_default_ground_plane(prim_path=self._ground_plane_path)
