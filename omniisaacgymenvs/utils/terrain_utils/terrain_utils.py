@@ -34,8 +34,8 @@ from scipy import interpolate
 from math import sqrt
 
 from omni.isaac.core.prims import XFormPrim
-from pxr import UsdPhysics, Sdf, Gf, PhysxSchema
-
+from pxr import UsdPhysics, Sdf, Gf, PhysxSchema, Usd
+import omni.kit.commands
 
 def random_uniform_terrain(terrain, min_height, max_height, step=1, downsampled_scale=None,):
     """
@@ -375,10 +375,21 @@ def add_terrain_to_stage(stage, vertices, triangles, position=None, orientation=
                         name="terrain",
                         position=position,
                         orientation=orientation)
+    # Addind a simple Collider does not work
+    # omni.kit.commands.execute('SetRigidBody',
+    #     path=Sdf.Path('/World/terrain'),
+    #     approximationShape='convexHull',
+    #     kinematic=False)
+    # omni.kit.commands.execute('CreateJointsCommand',
+    #     stage=Usd.Stage.Open(rootLayer=Sdf.Find('anon:000001BFCF67EBB0:World0.usd'), sessionLayer=Sdf.Find('anon:000001BFCF67FC90:World0-session.usda')),
+    #     joint_type='Fixed',
+    #     paths=['/World/terrain'],
+    #     join_to_parent=False)
+
 
     UsdPhysics.CollisionAPI.Apply(terrain.prim)
-    # collision_api = UsdPhysics.MeshCollisionAPI.Apply(terrain.prim)
-    # collision_api.CreateApproximationAttr().Set("meshSimplification")
+    collision_api = UsdPhysics.MeshCollisionAPI.Apply(terrain.prim)
+    collision_api.CreateApproximationAttr().Set("meshSimplification")
     physx_collision_api = PhysxSchema.PhysxCollisionAPI.Apply(terrain.prim)
     physx_collision_api.GetContactOffsetAttr().Set(0.02)
     physx_collision_api.GetRestOffsetAttr().Set(0.00)

@@ -51,6 +51,13 @@ def initialize_task(config, env, init_sim=True):
     # Spotmicro
     from omniisaacgymenvs.tasks.spotmicroai import SpotmicroaiTask
     from omniisaacgymenvs.tasks.spotmicroai_terrain import SpotmicroaiTerrainTask
+    # Unitree Robotics
+    # B1
+    from omniisaacgymenvs.tasks.b1 import B1Task
+    from omniisaacgymenvs.tasks.b1_terrain import B1TerrainTask
+    # A1
+    from omniisaacgymenvs.tasks.a1 import A1Task
+    from omniisaacgymenvs.tasks.a1_terrain import A1TerrainTask
 
     # Mappings from strings to environments
     task_map = {
@@ -72,7 +79,11 @@ def initialize_task(config, env, init_sim=True):
         "Spot": SpotTask,
         "SpotTerrain": SpotTerrainTask,
         "Spotmicroai": SpotmicroaiTask,
-        "SpotmicroaiTerrain": SpotmicroaiTerrainTask
+        "SpotmicroaiTerrain": SpotmicroaiTerrainTask,
+        "B1": B1Task,
+        "B1Terrain": B1TerrainTask,
+        "A1": A1Task,
+        "A1Terrain": A1TerrainTask
     }
 
     cfg = sim_config.config
