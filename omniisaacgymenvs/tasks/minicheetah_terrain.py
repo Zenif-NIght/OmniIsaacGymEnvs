@@ -215,7 +215,7 @@ class MinicheetahTerrainTask(RLTask):
         anymal_orientation = torch.tensor([0.0, 0.0, 0.0, 0.0])
         anymal = Minicheetah(prim_path=self.default_zero_env_path + "/minicheetah", 
                         name="minicheetah",
-                        usd_path="E:/Bored Engineer Github/Bored Engineer/Robots_for_Omniverse/openUSD_assets/mit_mini_cheetah/minicheetah/minicheetah.usd",
+                        usd_path="/home/ctaw/Documents/GitHub/Robots_for_Omniverse/openUSD_assets/mit_mini_cheetah/minicheetah/minicheetah.usd",
                         translation=anymal_translation, 
                         orientation=anymal_orientation,)
         self._sim_config.apply_articulation_settings("minicheetah", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("minicheetah"))

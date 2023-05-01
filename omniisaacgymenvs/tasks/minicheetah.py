@@ -118,7 +118,7 @@ class MinicheetahTask(RLTask):
     def get_anymal(self):
         anymal = Minicheetah(prim_path=self.default_zero_env_path + "/minicheetah", 
                     name="Minicheetah",
-                    usd_path="E:/Bored Engineer Github/Bored Engineer/Robots_for_Omniverse/openUSD_assets/mit_mini_cheetah/minicheetah/minicheetah.usd", 
+                    usd_path="/home/ctaw/Documents/GitHub/Robots_for_Omniverse/openUSD_assets/mit_mini_cheetah/minicheetah/minicheetah.usd", 
                     translation=self._anymal_translation)
         self._sim_config.apply_articulation_settings("Minicheetah", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("Minicheetah"))
 

@@ -215,7 +215,7 @@ class B1TerrainTask(RLTask):
         anymal_orientation = torch.tensor([1.0, 0.0, 0.0, 0.0])
         anymal = B1(prim_path=self.default_zero_env_path + "/b1", 
                         name="b1",
-                        usd_path="E:/Bored Engineer Github/Bored Engineer/Robots_for_Omniverse/openUSD_assets/UnitreeRobotics/b1/b1.usd",
+                        usd_path="/home/ctaw/Documents/GitHub/Robots_for_Omniverse/openUSD_assets/UnitreeRobotics/b1/b1.usd",
                         translation=anymal_translation, 
                         orientation=anymal_orientation,)
         self._sim_config.apply_articulation_settings("b1", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("b1"))

@@ -207,7 +207,7 @@ class SpotTerrainTask(RLTask):
         self._create_trimesh()
         self.terrain_origins = torch.from_numpy(self.terrain.env_origins).to(self.device).to(torch.float)
 # Local Machine path
-# E:/Bored Engineer Github/Bored Engineer/Robots_for_Omniverse/openUSD_assets/spot/            
+# /home/ctaw/Documents/GitHub/Robots_for_Omniverse/openUSD_assets/spot/            
     def get_anymal(self):
         self.base_init_state = torch.tensor(self.base_init_state, dtype=torch.float, device=self.device, requires_grad=False)
         anymal_translation = torch.tensor([0.0, 0.0, 0.7])
