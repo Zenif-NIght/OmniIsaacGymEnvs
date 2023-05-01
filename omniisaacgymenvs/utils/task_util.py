@@ -61,7 +61,10 @@ def initialize_task(config, env, init_sim=True):
     # Go1
     from omniisaacgymenvs.tasks.go1 import Go1Task
     from omniisaacgymenvs.tasks.go1_terrain import Go1TerrainTask
-
+    # MIT Mini Cheetah
+    from omniisaacgymenvs.tasks.minicheetah import MinicheetahTask
+    from omniisaacgymenvs.tasks.minicheetah_terrain import MinicheetahTerrainTask
+    
     # Mappings from strings to environments
     task_map = {
         "AllegroHand": AllegroHandTask,
@@ -88,7 +91,9 @@ def initialize_task(config, env, init_sim=True):
         "A1": A1Task,
         "A1Terrain": A1TerrainTask,
         "Go1": Go1Task,
-        "Go1Terrain": Go1TerrainTask
+        "Go1Terrain": Go1TerrainTask,
+        "Minicheetah": MinicheetahTask,
+        "MinicheetahTerrain": MinicheetahTerrainTask
     }
 
     cfg = sim_config.config
