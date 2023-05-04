@@ -23,7 +23,22 @@ provider "aws" {
     region = local.region
 }
 
-# Find AMI id
+
+resource "aws_instance" "isaac_sim_oige" {
+    ami             = "ami-0277b52859bac6f4b"
+    instance_type   = local.instance_type
+    key_name        = "isaac-sim-oige-key"
+    user_data	    = file("isaac-sim-oige.sh")
+    security_groups = [ "Docker" ]
+
+    tags = {
+        Name = "NVIDIA Omniverse GPU-Optimized for running Isaac-Sim Container"
+    }
+}
+
+#---------------------------------------------------------------
+# Images - AMI
+#---------------------------------------------------------------
 data "aws_ami" "example" {
   executable_users = ["self"]
   most_recent      = true
@@ -46,20 +61,8 @@ data "aws_ami" "example" {
   }
 }
 
-resource "aws_instance" "app_server" {
-    ami             = "ami-0277b52859bac6f4b"
-    instance_type   = local.instance_type
-    key_name        = "isaac-sim-instance"
-    user_data	    = file("isaac-sim-oige.sh")
-    security_groups = [ "Docker" ]
-
-    tags = {
-        Name = "Instance for Nvidia Isaac Container"
-    }
-}
-
 #---------------------------------------------------------------
-# Security Group
+# Network & Security
 #---------------------------------------------------------------
 resource "aws_security_group" "Docker" {
     tags = {
@@ -67,6 +70,20 @@ resource "aws_security_group" "Docker" {
     }
 }
 
+resource "aws_key_pair" "isaac-sim-oige-public-key" {
+  key_name   = "isaac-sim-oige-key"
+  public_key = tls_private_key.rsa.public_key_openssh
+}
+
+resource "tls_private_key" "rsa" {
+  algorithm = "RSA"
+  rsa_bits = 4096
+}
+
+resource "local_file" "isaac-sim-oige-private-key" {
+  content = tls_private_key.rsa.private_key_pem
+  filename = "isaac-sim-oige-private-key"
+}
 
 #---------------------------------------------------------------
 # Supporting Resources
