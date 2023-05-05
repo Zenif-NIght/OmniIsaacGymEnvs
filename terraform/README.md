@@ -17,14 +17,19 @@ The Terraform script should create a private key on the terraform folder named i
 Verify the github repo [Robots_for_Omniverse](https://github.com/boredengineering/Robots_for_Omniverse) for the list of robots.  <br/>
 
 ## **Commands:**<br/>
-Create an AWS Key pair. (either .pem (for terminal) or .ppk (for putty))<br/>
 !!! Required to SSH into the instance. !!!<br/>
+You can also attach an existing Key-pair or manually create one.<br/>
 
 **Clone the OIGE Github repo**<br/>
 > git clone https://github.com/boredengineering/OmniIsaacGymEnvs.git<br/>
 
 Then go to the folder OmniIsaacGymEnvs/terraform<br/>
 > cd OmniIsaacGymEnvs/terraform<br/>
+
+- Verify if AWS CLI works.<br/>
+> aws sso login --profile profile-name <br/>
+
+If does not work check the AWS CLI Commands for instructions.<br/>
 
 **Terraform Commands:**<br/>
 - For Installing run:<br/>
@@ -34,8 +39,12 @@ Then go to the folder OmniIsaacGymEnvs/terraform<br/>
 - For Deleting run:<br/>
 > terraform destroy<br/>
 
+**SSH into the Instance**<br/>
+Once with the instance public-Ipv4 to connect you must run:<br/>
+> ssh root@instance-public-Ipv4 -i isaac-sim-oige-private-key
+
 **AWS CLI Commands:**<br/>
-- Verify AWS CLI works.<br/>
+- Verify if AWS CLI works.<br/>
 > aws sso login --profile my-dev-profile <br/>
 
 - If you cannot login, you probably have to configure your sso profile.<br/>
