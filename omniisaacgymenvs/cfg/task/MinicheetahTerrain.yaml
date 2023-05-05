@@ -26,7 +26,7 @@ env:
 
   baseInitState:
     pos: [0.0, 0.0, 0.444] # x,y,z [m]
-    rot: [0.0, 0.0, 0.0, 0.0] # w,x,y,z [quat]
+    rot: [0.0, 0.0, 0.0, 1.0] # w,x,y,z [quat]
     vLinear: [0.0, 0.0, 0.0]  # x,y,z [m/s]
     vAngular: [0.0, 0.0, 0.0]  # x,y,z [rad/s]
 
