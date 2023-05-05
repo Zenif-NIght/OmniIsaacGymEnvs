@@ -128,19 +128,21 @@ class RLTask(BaseTask):
         collision_filter_global_paths = list()
         # This is supposed to Add a simple Flat Ground Plane
         if self._sim_config.task_config["sim"].get("add_ground_plane", True):
+            self._ground_plane_path = "/World/defaultGroundPlane"
             # Get stage handle
             stage = omni.usd.get_context().get_stage()
             # Duct tape solution 1 - Add a Flat Ground Plane
+            # "/groundPlane"
             omni.kit.commands.execute(
                 "AddGroundPlaneCommand",
                 stage=stage,
-                planePath="/groundPlane",
+                planePath="/groundPlane" ,
                 axis="Z",
                 size=1500.0,
-                position=Gf.Vec3f(0, 0, -50),
+                position=Gf.Vec3f(0, 0, 0),
                 color=Gf.Vec3f(0.5),
             )
-            self._ground_plane_path = "/World/defaultGroundPlane"
+            # self._ground_plane_path = "/World/defaultGroundPlane"
             collision_filter_global_paths.append(self._ground_plane_path)
             scene.add_default_ground_plane(prim_path=self._ground_plane_path)
             # Duct tape Solution 2 - Add RigidBody to whatever plane is created
