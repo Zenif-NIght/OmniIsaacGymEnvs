@@ -13,14 +13,14 @@ env:
   controlFrequencyInv: 2
 
   baseInitState:
-    pos: [0.0, 0.0, 0.45] # x,y,z [m]
-    rot: [0.0, 0.0, 0.0, 0.0] # x,y,z,w [quat]
+    pos: [0.0, 0.0, 0.35] # x,y,z [m]
+    rot: [0.0, 0.0, 0.0, 1.0] # x,y,z,w [quat]
     vLinear: [0.0, 0.0, 0.0]  # x,y,z [m/s]
     vAngular: [0.0, 0.0, 0.0]  # x,y,z [rad/s]
 
   randomCommandVelocityRanges:
-    linear_x: [-2., 2.] # min max [m/s]
-    linear_y: [-1., 1.]   # min max [m/s]
+    linear_x: [-1., 1.] # min max [m/s]
+    linear_y: [-2., 2.]   # min max [m/s]
     yaw: [-1., 1.]          # min max [rad/s]
 
   control:
@@ -30,20 +30,20 @@ env:
     actionScale: 13.5
 
   defaultJointAngles:  # = target angles when action = 0.0
-    LF_HAA: 0.03    # [rad]
-    LH_HAA: 0.03    # [rad]
-    RF_HAA: -0.03   # [rad]
-    RH_HAA: -0.03   # [rad]
+    LF_HAA: 0.1    # [rad]
+    LH_HAA: 0.1    # [rad]
+    RF_HAA: -0.1   # [rad]
+    RH_HAA: -0.1   # [rad]
 
-    LF_HFE: 0.4     # [rad]
-    LH_HFE: -0.4    # [rad]
-    RF_HFE: 0.4     # [rad]
-    RH_HFE: -0.4    # [rad]
+    LF_HFE: 0.8     # [rad]
+    LH_HFE: -1.0    # [rad]
+    RF_HFE: 0.8     # [rad]
+    RH_HFE: -1.0    # [rad]
 
-    LF_KFE: -0.8    # [rad]
-    LH_KFE: 0.8     # [rad]
-    RF_KFE: -0.8    # [rad]
-    RH_KFE: 0.8     # [rad]
+    LF_KFE: -1.5    # [rad]
+    LH_KFE: -1.5     # [rad]
+    RF_KFE: -1.5    # [rad]
+    RH_KFE: -1.5    # [rad]
 
   learn:
     # rewards
@@ -64,7 +64,7 @@ env:
     episodeLength_s: 50
 
 sim:
-  dt: 0.01
+  dt: 0.005
   use_gpu_pipeline: ${eq:${...pipeline},"gpu"}
   gravity: [0.0, 0.0, -9.81]
   add_ground_plane: True
