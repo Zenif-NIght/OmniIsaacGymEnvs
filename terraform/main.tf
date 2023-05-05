@@ -1,39 +1,41 @@
 locals {
-    instance_name = var.instance_name
-    region       = var.region
-    instance_type = var.instance_type
-    nvidia_ami = var.nvidia_ami
-    nvidia_ov_ami = var.nvidia_ov_ami
-    # vpc_cidr
+  instance_name = var.instance_name
+  region       = var.region
+  instance_type = var.instance_type
+  nvidia_ami = var.nvidia_ami
+  nvidia_ov_ami = var.nvidia_ov_ami
+  # vpc_cidr
 }
 
 terraform {
-    required_version = ">= 1.2.7"
-    required_providers {
+  required_version = ">= 1.2.7"
+  required_providers {
     aws = {
-        source  = "hashicorp/aws"
-        version = ">= 4.30.0"
+      source  = "hashicorp/aws"
+      version = ">= 4.30.0"
     }
   }
 
 }
 
 provider "aws" {
-    profile = "default"
-    region = local.region
+  profile = "default"
+  region = local.region
 }
 
-
+# NVIDIA Omniverse GPU-Optimized for running Isaac-Sim Container
 resource "aws_instance" "isaac_sim_oige" {
-    ami             = "ami-0277b52859bac6f4b"
-    instance_type   = local.instance_type
-    key_name        = "isaac-sim-oige-key"
-    user_data	    = file("isaac-sim-oige.sh")
-    security_groups = [ "Docker" ]
+  ami             = "ami-0277b52859bac6f4b"
+  instance_type   = local.instance_type
+  key_name        = "isaac-sim-oige-key"
+  user_data	    = file("isaac-sim-oige.sh")
+  security_groups = [ "Docker" ]
 
-    tags = {
-        Name = "NVIDIA Omniverse GPU-Optimized for running Isaac-Sim Container"
-    }
+  tags = {
+    Name = "isaac-sim-oige"
+  }
+
+  depends_on = [  ] # should depend on the seucrity group
 }
 
 #---------------------------------------------------------------
@@ -65,9 +67,9 @@ data "aws_ami" "example" {
 # Network & Security
 #---------------------------------------------------------------
 resource "aws_security_group" "Docker" {
-    tags = {
-        type = "terraform-test-security-group"
-    }
+  tags = {
+    type = "terraform-test-security-group"
+  }
 }
 
 resource "aws_key_pair" "isaac-sim-oige-public-key" {
