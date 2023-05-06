@@ -21,34 +21,40 @@ Verify the github repo [Robots_for_Omniverse](https://github.com/boredengineerin
 You can also attach an existing Key-pair or manually create one.<br/>
 
 **Clone the OIGE Github repo**<br/>
-> git clone https://github.com/boredengineering/OmniIsaacGymEnvs.git<br/>
+> ```git clone https://github.com/boredengineering/OmniIsaacGymEnvs.git``` <br/>
 
 Then go to the folder OmniIsaacGymEnvs/terraform<br/>
-> cd OmniIsaacGymEnvs/terraform<br/>
+> ```cd OmniIsaacGymEnvs/terraform``` <br/>
 
 - Verify if AWS CLI works.<br/>
-> aws sso login --profile profile-name <br/>
+> ```aws sso login --profile profile-name``` <br/>
 
 If does not work check the AWS CLI Commands for instructions.<br/>
 
 **Terraform Commands:**<br/>
 - For Installing run:<br/>
-> terraform init<br/>
-> terraform plan<br/>
-> terraform apply<br/>
+> ```terraform init``` <br/>
+> ```terraform plan``` <br/>
+> ```terraform apply``` <br/>
 - For Deleting run:<br/>
-> terraform destroy<br/>
+> ```terraform destroy``` <br/>
 
 **SSH into the Instance**<br/>
+Verify the recently created Instance, for specific region add: **--region name-of-region**<br/>
+> ```aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Address:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name``` <br/>
+
+Copy the Address of the Instance with the Correct Name (default is **isaac-sim-oige**).<br/>
 Once with the instance public-Ipv4 to connect you must run:<br/>
-> ssh root@instance-public-Ipv4 -i isaac-sim-oige-private-key
+> ```ssh root@instance-public-Ipv4 -i isaac-sim-oige-private-key```
+
+!!! Make sure a .pem key is created !!!<br/>
 
 **AWS CLI Commands:**<br/>
 - Verify if AWS CLI works.<br/>
-> aws sso login --profile my-dev-profile <br/>
+> ```aws sso login --profile my-dev-profile``` <br/>
 
 - If you cannot login, you probably have to configure your sso profile.<br/>
-> aws configure sso
+> ```aws configure sso```
 
 Should input on the terminal<br/>
 
@@ -60,23 +66,23 @@ Should input on the terminal<br/>
 
 Verify created instance name 
 - Describe Instances on a Region, if you need an specific region add: **--region name-of-region**<br/>
-> aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Address:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name <br/>
+> ```aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Address:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name``` <br/>
 
 - For accessing the Instance <br/>
-> ssh stuff here
+> ```ssh root@instance-public-Ipv4 -i isaac-sim-oige-private-key```
 
 **Docker Commands:**<br/>
 - Start or Stop the Docker Container<br/>
-> docker start isaac-sim-oige<br/>
-> docker stop isaac-sim-oige<br/>
+> ```docker start isaac-sim-oige```<br/>
+> ```docker stop isaac-sim-oige```<br/>
 
 - Verify running containers<br/>
-> docker ps<br/>
+> ```docker ps```<br/>
 - Verify all containers<br/>
-> docker ps -a<br/>
+> ```docker ps -a```<br/>
 
 - For connecting to the running Docker Container<br/>
-> docker exec -it -w /workspace/omniisaacgymenvs/omniisaacgymenvs isaac-sim-oige bash<br/>
+> ```docker exec -it -w /workspace/omniisaacgymenvs/omniisaacgymenvs isaac-sim-oige bash```<br/>
 
 
 
@@ -105,7 +111,7 @@ Now we can setup the AWS CLI with SSO<br/>
 
 ### **Configure AWS CLI**
 
-> aws configure sso
+> ```aws configure sso```
 
 Should input on the terminal<br/>
 
@@ -115,7 +121,7 @@ Should input on the terminal<br/>
 > SSO registration scopes [None]: sso:account:access<br/>
 
 For a default profile:<br/>
-> aws configure --profile= >profile-name< <br/>
+> ```aws configure --profile= profile-name``` <br/>
 
 Should input on the terminal<br/>
 
@@ -126,10 +132,10 @@ Should input on the terminal<br/>
 
 ## **Setup Terraform (Good practices)**
 **On windows, using Chocolatey**<br/>
-> choco install terraform
+> ```choco install terraform```
 
 Verify the installation<br/>
-> terraform -help
+> ```terraform -help```
 
 **On Windows, manual install**<br/>
 To install Terraform, find the (appropriate package)[https://developer.hashicorp.com/terraform/downloads] for your system and download it as a zip archive.<br/>
@@ -168,9 +174,9 @@ Documentation Sources<br/>
 Vantage is a self-service cloud cost platform that gives developers the tools they need to analyze, report on and optimize AWS, Azure, and GCP costs.<br/>
 
 To filter instances of the specified type and only display their instance IDs, Availability Zone and the specified tag value in table format<br/>
-> aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Address:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name <br/>
+> ```aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Address:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name``` <br/>
 
 Get public ip of an instance<br/>
-> aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicIpAddress' -output text --profile profile-name <br/>
+> ```aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicIpAddress' -output text --profile profile-name``` <br/>
 
 Note: can only get the Ip of running instances.
