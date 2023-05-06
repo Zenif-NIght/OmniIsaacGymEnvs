@@ -4,3 +4,8 @@ runs
 omniisaacgymenvs.egg-info/
 checkpoints
 omniisaacgymenvs/wandb
+.terraform.lock.hcl
+.terraform
+terraform.tfstate
+terraform.tfstate.backup
+isaac-sim-oige-private-key.pem

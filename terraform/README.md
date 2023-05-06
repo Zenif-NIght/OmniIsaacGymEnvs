@@ -30,6 +30,9 @@ Then go to the folder OmniIsaacGymEnvs/terraform<br/>
 > ```aws sso login --profile profile-name``` <br/>
 
 If does not work check the AWS CLI Commands for instructions.<br/>
+```export AWS_PROFILE=my-aws-sso-profile```<br/>
+
+```$Env:AWS_PROFILE = "my-aws-sso-profile"```<br/>
 
 **Terraform Commands:**<br/>
 - For Installing run:<br/>
@@ -45,7 +48,7 @@ Verify the recently created Instance, for specific region add: **--region name-o
 
 Copy the Address of the Instance with the Correct Name (default is **isaac-sim-oige**).<br/>
 Once with the instance public-Ipv4 to connect you must run:<br/>
-> ```ssh root@instance-public-Ipv4 -i isaac-sim-oige-private-key```
+> ```ssh -i "isaac-sim-oige-private-key.pem" root@instance-public-Ipv4```
 
 !!! Make sure a .pem key is created !!!<br/>
 
@@ -180,3 +183,40 @@ Get public ip of an instance<br/>
 > ```aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicIpAddress' -output text --profile profile-name``` <br/>
 
 Note: can only get the Ip of running instances.
+
+```export AWS_PROFILE=my-aws-sso-profile```<br/>
+
+```$Env:AWS_PROFILE = "my-aws-sso-profile"```<br/>
+
+```aws ec2 describe-images --owners aws-marketplace --filters '[{"Name": "name", "Values": ["NVIDIA Omniverse GPU-Optimized AMI"]}, {"Name": "virtualization-type", "Values": ["hvm"]}, {"Name": "root-device-type", "Values": ["ebs"]}]' --query 'sort_by(Images, &CreationDate)[-1]' --region us-east-1 --output json```
+
+```aws ec2 describe-images --owners aws-marketplace --filters "Name=name,Values=NVIDIA Omniverse GPU-Optimized AMI" --query 'Images[*].[ImageId]' --region us-east-1 --output json```
+
+```aws ec2 describe-images --owners aws-marketplace --filters "Name=name,Values=NVIDIA Omniverse GPU-Optimized AMI" "Name=virtualization-type,Values=hvm" "Name=root-device-type,Values=ebs" --query 'Images[*].[ImageId]' --region us-east-1 --output json```
+
+
+Error
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Permissions for 'isaac-sim-oige-private-key.pem' are too open.
+It is required that your private key files are NOT accessible by others.
+This private key will be ignored.
+Load key "isaac-sim-oige-private-key.pem": bad permissions
+root@54.144.212.33: Permission denied (publickey).
+
+As per security policy, the private key file must not be publicly viewable in order to successfully log in to the server using SSH protocol.
+
+Solution
+chmod 400 server.pem 
+
+for windows users use:
+
+icacls.exe isaac-sim-oige-private-key.pem /reset
+
+icacls.exe isaac-sim-oige-private-key.pem /grant:r "$($env:username):(r)"
+
+icacls.exe isaac-sim-oige-private-key.pem /inheritance:r
+
+thats it! your keys.pem have same restrisctions as you use chmod 400

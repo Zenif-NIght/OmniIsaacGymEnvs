@@ -3,7 +3,6 @@ locals {
   region       = var.region
   instance_type = var.instance_type
   nvidia_ami = var.nvidia_ami
-  # vpc_cidr
 }
 
 terraform {
@@ -26,21 +25,23 @@ provider "aws" {
 # Create the Instance
 # NVIDIA Omniverse GPU-Optimized for running Isaac-Sim Container
 resource "aws_instance" "isaac_sim_oige" {
-  ami             = data.aws_ami.nvidia_omniverse_ami
+  ami             = local.nvidia_ami
+  # ami             = data.aws_ami.nvidia_omniverse_ami.id
   instance_type   = local.instance_type
   key_name        = "isaac-sim-oige-key"
   user_data	      = file("isaac-sim-oige.sh")
   security_groups = [ aws_security_group.sg_isaac_sim_oige.id ]
-  subnet_id       = var.subnet_id
+  subnet_id       = aws_subnet.subnet.id
 
-  Env = "Isaac-Sim"
+  # Env = "isaac-sim"
   ebs_block_device {
     device_name = "/dev/sda1"
     volume_size = 200
   }
 
   tags = {
-    Name = "isaac-sim-oige"
+    Name = local.instance_name
+    Env = var.env
   }
 
   depends_on = [
@@ -52,26 +53,27 @@ resource "aws_instance" "isaac_sim_oige" {
 #---------------------------------------------------------------
 # Images - AMI
 #---------------------------------------------------------------
-data "aws_ami" "nvidia_omniverse_ami" {
-  executable_users = ["self"]
-  most_recent      = true
-  owners           = ["aws-marketplace"]
+# Returns Null, cannot find the AMI
+# data "aws_ami" "nvidia_omniverse_ami" {
+#   executable_users = ["self"]
+#   most_recent      = true
+#   owners           = ["aws-marketplace"]
 
-  filter {
-    name   = "name"
-    values = ["NVIDIA Omniverse GPU-Optimized AMI"]
-  }
+#   filter {
+#     name   = "name"
+#     values = ["NVIDIA Omniverse GPU-Optimized AMI"]
+#   }
 
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
+#   filter {
+#     name   = "root-device-type"
+#     values = ["ebs"]
+#   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-}
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
 
 #---------------------------------------------------------------
 # Network & Security
@@ -104,6 +106,7 @@ resource "aws_security_group" "sg_isaac_sim_oige" {
 
   tags = {
     Name = "sg_isaac_sim_oige"
+    Env  = var.env
   }
   depends_on = [ aws_vpc.vpc ]
 }
@@ -122,7 +125,7 @@ resource "tls_private_key" "rsa" {
 
 resource "local_file" "isaac-sim-oige-private-key" {
   content = tls_private_key.rsa.private_key_pem
-  filename = "isaac-sim-oige-private-key"
+  filename = "isaac-sim-oige-private-key.pem"
 }
 #---------------------------------------------------------------
 # VPC
@@ -181,9 +184,9 @@ resource "aws_default_route_table" "route_table" {
 #---------------------------------------------------------------
 # Output
 #---------------------------------------------------------------
-output "ami_id" {
-  value = data.aws_ami.nvidia_omniverse_ami.id
-}
-output "ami_name" {
-  value = data.aws_ami.nvidia_omniverse_ami.name
-}
+# output "ami_id" {
+#   value = data.aws_ami.nvidia_omniverse_ami.id
+# }
+# output "ami_name" {
+#   value = data.aws_ami.nvidia_omniverse_ami.name
+# }
