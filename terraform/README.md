@@ -12,9 +12,9 @@
 > - OIGE repo
 
 **Expected behaviour:**<br/>
-The Terraform script should create a private key on the terraform folder named isaac-sim-oige-private-key.pem and an AWS instance and attach a public Key Pair to it. It will use the [NVIDIA Omniverse GPU-Optimized AMI](https://aws.amazon.com/marketplace/pp/prodview-4gyborfkw4qjs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa) and will run the script (**isaac-sim-oige.sh**) to install an Isaac-Sim Docker Container with [OIGE](https://github.com/boredengineering/OmniIsaacGymEnvs.git) and [Robots_for_Omniverse](https://github.com/boredengineering/Robots_for_Omniverse) that contain robots ready to run on OIGE. <br/>
+The Terraform script should create a private key on the terraform folder named isaac-sim-oige-key.pem and an AWS instance and attach a public Key Pair to it. It will use the [NVIDIA Omniverse GPU-Optimized AMI](https://aws.amazon.com/marketplace/pp/prodview-4gyborfkw4qjs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa) and will run the script (**isaac-sim-oige.sh**) to install an Isaac-Sim Docker Container with [OIGE](https://github.com/boredengineering/OmniIsaacGymEnvs.git) and [Robots_for_Omniverse](https://github.com/boredengineering/Robots_for_Omniverse) that contain robots ready to run on OIGE. <br/>
 
-Verify the github repo [Robots_for_Omniverse](https://github.com/boredengineering/Robots_for_Omniverse) for the list of robots.  <br/>
+Verify the github repo [Robots_for_Omniverse](https://github.com/boredengineering/Robots_for_Omniverse) for the list of available robots.  <br/>
 
 ## **Commands:**<br/>
 !!! Required to SSH into the instance. !!!<br/>
@@ -24,14 +24,15 @@ You can also attach an existing Key-pair or manually create one.<br/>
 > ```git clone https://github.com/boredengineering/OmniIsaacGymEnvs.git``` <br/>
 
 Then go to the folder OmniIsaacGymEnvs/terraform<br/>
-> ```cd OmniIsaacGymEnvs/terraform``` <br/>
+> ```cd ./OmniIsaacGymEnvs/terraform``` <br/>
 
 - Verify if AWS CLI works.<br/>
 > ```aws sso login --profile profile-name``` <br/>
 
-If does not work check the AWS CLI Commands for instructions.<br/>
+If does not work check the section **AWS CLI Commands** for instructions.<br/>
+- For Linux<br/>
 ```export AWS_PROFILE=my-aws-sso-profile```<br/>
-
+- For Windows<br/>
 ```$Env:AWS_PROFILE = "my-aws-sso-profile"```<br/>
 
 **Terraform Commands:**<br/>
@@ -44,13 +45,19 @@ If does not work check the AWS CLI Commands for instructions.<br/>
 
 **SSH into the Instance**<br/>
 Verify the recently created Instance, for specific region add: **--region name-of-region**<br/>
-> ```aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Address:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name``` <br/>
+> ```aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Ipv4:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name``` <br/>
 
 Copy the Address of the Instance with the Correct Name (default is **isaac-sim-oige**).<br/>
 Once with the instance public-Ipv4 to connect you must run:<br/>
-> ```ssh -i "isaac-sim-oige-private-key.pem" root@instance-public-Ipv4```
+> ```ssh -i "isaac-sim-oige-key.pem" root@instance-public-Ipv4```
 
 !!! Make sure a .pem key is created !!!<br/>
+!!! Attention !!! - powershell throws bad key error because the file is created with permission 755<br/>
+If on linux just run:<br/>
+> ```chmod 400 isaac-sim-oige-key.pem```<br/>
+
+If on Windows<br/>
+Need to convert to .ppk using Puttygen and use Putty to connect. The Windows ACLs dont make it easy to change permission<br/>
 
 **AWS CLI Commands:**<br/>
 - Verify if AWS CLI works.<br/>
@@ -69,10 +76,10 @@ Should input on the terminal<br/>
 
 Verify created instance name 
 - Describe Instances on a Region, if you need an specific region add: **--region name-of-region**<br/>
-> ```aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Address:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name``` <br/>
+> ```aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Ipv4:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name``` <br/>
 
 - For accessing the Instance <br/>
-> ```ssh root@instance-public-Ipv4 -i isaac-sim-oige-private-key```
+> ```ssh root@instance-public-Ipv4 -i isaac-sim-oige-key```
 
 **Docker Commands:**<br/>
 - Start or Stop the Docker Container<br/>
@@ -90,21 +97,24 @@ Verify created instance name
 
 
 ## **Setup AWS (Good practices)**
-A good safety practice is never to use the Root account on AWS. Therefore, it is reccomended to create a user with admin permissions.<br/>
+A good safety practice is never to use the Root Account on AWS. Therefore, it is reccomended to create a user with admin permissions.<br/>
 There are several ways to create an user, the most convenient way is to make a user with SSO access.<br/>
 
+
 **Login to the Dashboard as Root user:**<br/>
-- Go to IAM
-- Create a User Group
-- Create a User
+We gonna create an account which we will attach a User-Group from AWS SSO<br/>
+- Go to IAM<br/>
+- Create a User Group<br/>
+- Create a User and attach to the Group<br/>
+- Then attach permission policy to the group<br/>
 
 Then go to **AWS IAM Identity Center-(AWS SSO):**<br/>
-- Create a User
-- Create a Group
-- Add AWS account to the user in the group
-- Create and Apply a Permission set
-- Go to Settings —> Authentication
-- Create MFA ( Multi Factor Authentication )
+- Create a User<br/>
+- Create a Group<br/>
+- Add AWS account to the Group<br/>
+- Create and Apply a Permission set<br/>
+- Go to Settings —> Authentication<br/>
+- Create MFA ( Multi Factor Authentication )<br/>
 
 Now we can log on the AWS access portal URL:<br/>
 Example: https://--subdomain name--.awsapps.com/start<br/>
@@ -147,6 +157,7 @@ Finally, make sure that the **terraform** binary is available on your **PATH**. 
 
 [This Stack Overflow article contains instructions for setting the PATH on Windows through the user interface.](https://stackoverflow.com/questions/1618280/where-can-i-set-path-to-make-exe-on-windows)
 
+# **Appendix**
 ## **Github Repositories Used**
 Note: The official Nvidia repo of OIGE dont work out of the box.<br/>
 
@@ -188,35 +199,10 @@ Note: can only get the Ip of running instances.
 
 ```$Env:AWS_PROFILE = "my-aws-sso-profile"```<br/>
 
-```aws ec2 describe-images --owners aws-marketplace --filters '[{"Name": "name", "Values": ["NVIDIA Omniverse GPU-Optimized AMI"]}, {"Name": "virtualization-type", "Values": ["hvm"]}, {"Name": "root-device-type", "Values": ["ebs"]}]' --query 'sort_by(Images, &CreationDate)[-1]' --region us-east-1 --output json```
+```aws ec2 describe-images --owners aws-marketplace --filters '[{"Name": "name", "Values": ["NVIDIA Omniverse GPU-Optimized AMI"]}, {"Name": "virtualization-type", "Values": ["hvm"]}, {"Name": "root-device-type", "Values": ["ebs"]}]' --query 'sort_by(Images, &CreationDate)[-1]' --region us-east-1 --output json```<br/>
 
-```aws ec2 describe-images --owners aws-marketplace --filters "Name=name,Values=NVIDIA Omniverse GPU-Optimized AMI" --query 'Images[*].[ImageId]' --region us-east-1 --output json```
+```aws ec2 describe-images --owners aws-marketplace --filters "Name=name,Values=NVIDIA Omniverse GPU-Optimized AMI" --query 'Images[*].[ImageId]' --region us-east-1 --output json```<br/>
 
-```aws ec2 describe-images --owners aws-marketplace --filters "Name=name,Values=NVIDIA Omniverse GPU-Optimized AMI" "Name=virtualization-type,Values=hvm" "Name=root-device-type,Values=ebs" --query 'Images[*].[ImageId]' --region us-east-1 --output json```
+```aws ec2 describe-images --owners aws-marketplace --filters "Name=name,Values=NVIDIA Omniverse GPU-Optimized AMI" "Name=virtualization-type,Values=hvm" "Name=root-device-type,Values=ebs" --query 'Images[*].[ImageId]' --region us-east-1 --output json```<br/>
 
 
-Error
-
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-Permissions for 'isaac-sim-oige-private-key.pem' are too open.
-It is required that your private key files are NOT accessible by others.
-This private key will be ignored.
-Load key "isaac-sim-oige-private-key.pem": bad permissions
-root@54.144.212.33: Permission denied (publickey).
-
-As per security policy, the private key file must not be publicly viewable in order to successfully log in to the server using SSH protocol.
-
-Solution
-chmod 400 server.pem 
-
-for windows users use:
-
-icacls.exe isaac-sim-oige-private-key.pem /reset
-
-icacls.exe isaac-sim-oige-private-key.pem /grant:r "$($env:username):(r)"
-
-icacls.exe isaac-sim-oige-private-key.pem /inheritance:r
-
-thats it! your keys.pem have same restrisctions as you use chmod 400

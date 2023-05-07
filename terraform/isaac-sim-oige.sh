@@ -5,13 +5,14 @@
 docker pull public.ecr.aws/nvidia/isaac-sim:2022.2.1
 # Clone the OIGE and Robots_for_Omniverse Github Repos
 git clone https://github.com/boredengineering/OmniIsaacGymEnvs.git
-git clone https://github.com/boredengineering/Robots_for_Omniverse.git
-
 cd ./OmniIsaacGymEnvs
+git clone https://github.com/boredengineering/Robots_for_Omniverse.git
+# sftp://ubuntu@44.212.45.209/Robots_for_Omniverse
+
 # install isaac-sim container either use NGC or ECR docker images
 docker run --name isaac-sim-oige --entrypoint bash -it -d --gpus all -e "ACCEPT_EULA=Y" --network=host \
 -v ${PWD}:/workspace/omniisaacgymenvs \
--v ${PWD}:/workspace/Robots_for_Omniverse \
+-v ${PWD}/Robots_for_Omniverse:/workspace/Robots_for_Omniverse \
 -v ~/docker/isaac-sim/cache/ov:/root/.cache/ov:rw \
 -v ~/docker/isaac-sim/cache/pip:/root/.cache/pip:rw \
 -v ~/docker/isaac-sim/cache/glcache:/root/.cache/nvidia/GLCache:rw \

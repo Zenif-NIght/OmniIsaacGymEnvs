@@ -31,6 +31,11 @@ resource "aws_instance" "isaac_sim_oige" {
   key_name        = "isaac-sim-oige-key"
   user_data	      = file("isaac-sim-oige.sh")
   security_groups = [ aws_security_group.sg_isaac_sim_oige.id ]
+
+  # We Gonna pick the first availability zone that has the Instance Type we want
+  availability_zone = keys({ for az, details in data.aws_ec2_instance_type_offerings.my_ins_type :
+  az => details.instance_types if length(details.instance_types) != 0 })[0]
+
   subnet_id       = aws_subnet.subnet.id
 
   # Env = "isaac-sim"
@@ -76,6 +81,34 @@ resource "aws_instance" "isaac_sim_oige" {
 # }
 
 #---------------------------------------------------------------
+# List of Availability Zones in a Specific Region
+#---------------------------------------------------------------
+# return a list of all Availability Zones in a Specific Region
+data "aws_availability_zones" "my_azones" {
+  filter {
+    name   = "opt-in-status"
+    values = ["opt-in-not-required"]
+  }
+}
+
+#---------------------------------------------------------------
+# Instance Availability
+#---------------------------------------------------------------
+# Return Boolean if the instance type is available on the zone
+data "aws_ec2_instance_type_offerings" "my_ins_type" {
+  for_each=toset(data.aws_availability_zones.my_azones.names)
+    filter {
+      name   = "instance-type"
+      values = [local.instance_type]
+    }
+    filter {
+      name   = "location"
+      values = [each.key]
+    }
+
+    location_type = "availability-zone"
+}
+#---------------------------------------------------------------
 # Network & Security
 #---------------------------------------------------------------
 # Security Group
@@ -83,7 +116,6 @@ resource "aws_instance" "isaac_sim_oige" {
 resource "aws_security_group" "sg_isaac_sim_oige" {
   name        = "sg_isaac_sim_oige"
   description = "Allow all traffic in and out so we can talk to Omniverse Services"
-  # vpc_id      = aws_vpc.main.id
   vpc_id      = aws_vpc.vpc.id
 # protocol of -1 is equivalent to all
   ingress {
@@ -142,8 +174,13 @@ resource "aws_vpc" "vpc" {
 # Subnet
 #---------------------------------------------------------------
 resource "aws_subnet" "subnet" {
+  # We Gonna pick the first availability zone that has the Instance Type we want
+  availability_zone = keys({ for az, details in data.aws_ec2_instance_type_offerings.my_ins_type :
+  az => details.instance_types if length(details.instance_types) != 0 })[0]
+
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = var.subnet
+
   map_public_ip_on_launch = "true"
   tags = {
       Name = "${var.env}_subnet"
@@ -190,3 +227,8 @@ resource "aws_default_route_table" "route_table" {
 # output "ami_name" {
 #   value = data.aws_ami.nvidia_omniverse_ami.name
 # }
+# Filtered Output: As the output is list now, get the first item from list (just for learning)
+output "output_az" {
+  value = keys({ for az, details in data.aws_ec2_instance_type_offerings.my_ins_type :
+  az => details.instance_types if length(details.instance_types) != 0 })[0]
+}
