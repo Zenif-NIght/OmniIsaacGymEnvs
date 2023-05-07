@@ -7,6 +7,7 @@ docker pull public.ecr.aws/nvidia/isaac-sim:2022.2.1
 git clone https://github.com/boredengineering/OmniIsaacGymEnvs.git
 git clone https://github.com/boredengineering/Robots_for_Omniverse.git
 
+cd ./OmniIsaacGymEnvs
 # install isaac-sim container either use NGC or ECR docker images
 docker run --name isaac-sim-oige --entrypoint bash -it -d --gpus all -e "ACCEPT_EULA=Y" --network=host \
 -v ${PWD}:/workspace/omniisaacgymenvs \
