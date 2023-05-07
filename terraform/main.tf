@@ -124,8 +124,8 @@ resource "tls_private_key" "rsa" {
 }
 
 resource "local_file" "isaac-sim-oige-private-key" {
-  content = tls_private_key.rsa.private_key_pem
-  filename = "isaac-sim-oige-private-key.pem"
+  content = tls_private_key.rsa.private_key_openssh
+  filename = "isaac-sim-oige-key.pem"
 }
 #---------------------------------------------------------------
 # VPC

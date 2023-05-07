@@ -8,4 +8,5 @@ omniisaacgymenvs/wandb
 .terraform
 terraform.tfstate
 terraform.tfstate.backup
-isaac-sim-oige-private-key.pem
+isaac-sim-oige-key.pem
+isaac-sim-oige-key.ppk
