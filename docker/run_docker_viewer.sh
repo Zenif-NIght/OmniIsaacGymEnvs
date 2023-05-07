@@ -1,5 +1,5 @@
 xhost +
-docker run --name isaac-sim-oige --entrypoint bash -it -d --gpus all -e "ACCEPT_EULA=Y" --rm --network=host \
+docker run --name isaac-sim-oige --entrypoint bash -it -d --gpus all -e "ACCEPT_EULA=Y" --network=host \
 -v $HOME/.Xauthority:/root/.Xauthority \
 -e DISPLAY \
 -v /etc/vulkan/icd.d/nvidia_icd.json:/etc/vulkan/icd.d/nvidia_icd.json \

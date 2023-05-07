@@ -1,5 +1,5 @@
 # used to create the object
-name: Anymal
+name: Spot
 
 physics_engine: ${..physics_engine}
 # 4096
@@ -13,7 +13,7 @@ env:
   controlFrequencyInv: 2
 
   baseInitState:
-    pos: [0.0, 0.0, 0.62] # x,y,z [m]
+    pos: [0.0, 0.0, 0.7] # x,y,z [m]
     rot: [0.0, 0.0, 0.0, 0.0] # x,y,z,w [quat]
     vLinear: [0.0, 0.0, 0.0]  # x,y,z [m/s]
     vAngular: [0.0, 0.0, 0.0]  # x,y,z [rad/s]
@@ -107,10 +107,11 @@ sim:
     gpu_temp_buffer_capacity: 33554432
     gpu_max_num_partitions: 8
 
-  Anymal:
+# Anymal:
+  Spot:
     # -1 to use default values
-    override_usd_defaults: False
-    enable_self_collisions: False
+    override_usd_defaults: False # False
+    enable_self_collisions: False # False
     enable_gyroscopic_forces: True
     # also in stage params
     # per-actor

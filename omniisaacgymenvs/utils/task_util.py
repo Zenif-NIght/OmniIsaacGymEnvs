@@ -44,6 +44,26 @@ def initialize_task(config, env, init_sim=True):
     from omniisaacgymenvs.tasks.quadcopter import QuadcopterTask
     from omniisaacgymenvs.tasks.shadow_hand import ShadowHandTask
     from omniisaacgymenvs.tasks.crazyflie import CrazyflieTask
+
+    # Add the task python script for the task
+    from omniisaacgymenvs.tasks.spot import SpotTask
+    from omniisaacgymenvs.tasks.spot_terrain import SpotTerrainTask
+    # Spotmicro
+    from omniisaacgymenvs.tasks.spotmicroai import SpotmicroaiTask
+    from omniisaacgymenvs.tasks.spotmicroai_terrain import SpotmicroaiTerrainTask
+    # Unitree Robotics
+    # B1
+    from omniisaacgymenvs.tasks.b1 import B1Task
+    from omniisaacgymenvs.tasks.b1_terrain import B1TerrainTask
+    # A1
+    from omniisaacgymenvs.tasks.a1 import A1Task
+    from omniisaacgymenvs.tasks.a1_terrain import A1TerrainTask
+    # Go1
+    from omniisaacgymenvs.tasks.go1 import Go1Task
+    from omniisaacgymenvs.tasks.go1_terrain import Go1TerrainTask
+    # MIT Mini Cheetah
+    from omniisaacgymenvs.tasks.minicheetah import MinicheetahTask
+    from omniisaacgymenvs.tasks.minicheetah_terrain import MinicheetahTerrainTask
     
     # Mappings from strings to environments
     task_map = {
@@ -62,6 +82,18 @@ def initialize_task(config, env, init_sim=True):
         "ShadowHand": ShadowHandTask,
         "ShadowHandOpenAI_FF": ShadowHandTask,
         "ShadowHandOpenAI_LSTM": ShadowHandTask,
+        "Spot": SpotTask,
+        "SpotTerrain": SpotTerrainTask,
+        "Spotmicroai": SpotmicroaiTask,
+        "SpotmicroaiTerrain": SpotmicroaiTerrainTask,
+        "B1": B1Task,
+        "B1Terrain": B1TerrainTask,
+        "A1": A1Task,
+        "A1Terrain": A1TerrainTask,
+        "Go1": Go1Task,
+        "Go1Terrain": Go1TerrainTask,
+        "Minicheetah": MinicheetahTask,
+        "MinicheetahTerrain": MinicheetahTerrainTask
     }
 
     cfg = sim_config.config
