@@ -39,7 +39,7 @@ If does not work check the section **AWS CLI Commands** for instructions.<br/>
 - For Installing run:<br/>
 > ```terraform init``` <br/>
 > ```terraform plan``` <br/>
-> ```terraform apply``` <br/>
+> ```terraform apply -auto-approve``` <br/>
 - For Deleting run:<br/>
 > ```terraform destroy``` <br/>
 
