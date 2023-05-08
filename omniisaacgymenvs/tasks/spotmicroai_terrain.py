@@ -40,6 +40,8 @@ from omni.isaac.core.simulation_context import SimulationContext
 import numpy as np
 import torch
 import math
+import os
+from pathlib import Path
 
 from pxr import UsdPhysics, UsdLux
 
@@ -210,12 +212,17 @@ class SpotmicroaiTerrainTask(RLTask):
         self.terrain_origins = torch.from_numpy(self.terrain.env_origins).to(self.device).to(torch.float)
             
     def get_anymal(self):
+        start = Path.cwd()
+        path = "/Robots_for_Omniverse/openUSD_assets/spotmicroai/spotmicroai.usd"
+        robot_path = str(start)[:-34].strip()+path
+        relative_path = os.path.relpath(robot_path, start)
+        # Container Path /workspace/omniisaacgymenvs/Robots_for_Omniverse/openUSD_assets         
         self.base_init_state = torch.tensor(self.base_init_state, dtype=torch.float, device=self.device, requires_grad=False)
         anymal_translation = torch.tensor([0.0, 0.0, 0.66])
         anymal_orientation = torch.tensor([1.0, 0.0, 0.0, 0.0])
         anymal = Spotmicroai(prim_path=self.default_zero_env_path + "/spotmicroai", 
                         name="spotmicroai",
-                        usd_path="E:\Bored Engineer Github\Bored Engineer\Robots_for_Omniverse\openUSD_assets\spotmicroai\spotmicroai.usd",
+                        usd_path=relative_path,
                         translation=anymal_translation, 
                         orientation=anymal_orientation,)
         self._sim_config.apply_articulation_settings("spotmicroai", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("spotmicroai"))

@@ -10,3 +10,5 @@ terraform.tfstate
 terraform.tfstate.backup
 isaac-sim-oige-key.pem
 isaac-sim-oige-key.ppk
+
+Robots_for_Omniverse

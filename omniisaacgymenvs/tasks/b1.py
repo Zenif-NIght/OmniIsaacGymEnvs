@@ -38,7 +38,8 @@ from omni.isaac.core.utils.torch.rotations import *
 import numpy as np
 import torch
 import math
-
+import os
+from pathlib import Path
 
 class B1Task(RLTask):
     def __init__(
@@ -116,9 +117,14 @@ class B1Task(RLTask):
         return
 
     def get_anymal(self):
+        start = Path.cwd()
+        path = "/Robots_for_Omniverse/openUSD_assets/UnitreeRobotics/b1/b1.usd"
+        robot_path = str(start)[:-34].strip()+path
+        relative_path = os.path.relpath(robot_path, start)
+        # Container Path /workspace/omniisaacgymenvs/Robots_for_Omniverse/openUSD_assets          
         anymal = B1(prim_path=self.default_zero_env_path + "/b1", 
                     name="B1",
-                    usd_path="E:/Bored Engineer Github/Bored Engineer/Robots_for_Omniverse/openUSD_assets/UnitreeRobotics/b1/b1.usd", 
+                    usd_path=relative_path, 
                     translation=self._anymal_translation)
         self._sim_config.apply_articulation_settings("B1", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("B1"))
 
