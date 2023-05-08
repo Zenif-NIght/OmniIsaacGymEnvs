@@ -157,6 +157,12 @@ Finally, make sure that the **terraform** binary is available on your **PATH**. 
 
 [This Stack Overflow article contains instructions for setting the PATH on Windows through the user interface.](https://stackoverflow.com/questions/1618280/where-can-i-set-path-to-make-exe-on-windows)
 
+## Clean-Up
+
+> ```remove-item .terraform*```<br/>
+> ```remove-item terraform.tfstate*```<br/>
+> ```remove-item isaac-sim-oige-key.ppk```<br/>
+
 # **Appendix**
 ## **Github Repositories Used**
 Note: The official Nvidia repo of OIGE dont work out of the box.<br/>
