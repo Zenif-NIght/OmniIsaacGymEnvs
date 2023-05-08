@@ -30,6 +30,7 @@ resource "aws_instance" "isaac_sim_oige" {
   instance_type   = local.instance_type
   key_name        = "isaac-sim-oige-key"
   user_data	      = file("isaac-sim-oige.sh")
+  # user_data	      = file("isaac-sim-oige-v2.sh")
   security_groups = [ aws_security_group.sg_isaac_sim_oige.id ]
 
   # We Gonna pick the first availability zone that has the Instance Type we want

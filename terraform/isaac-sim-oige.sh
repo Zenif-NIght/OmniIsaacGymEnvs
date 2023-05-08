@@ -1,12 +1,12 @@
 #!/bin/bash
-
+sudo su
 # Note: Nvidia Omniverse AMI has everything already installed and preset.
 # Get Isaac Sim from AWS ECR
 docker pull public.ecr.aws/nvidia/isaac-sim:2022.2.1
 # Clone the OIGE and Robots_for_Omniverse Github Repos
 git clone https://github.com/boredengineering/OmniIsaacGymEnvs.git
 cd ./OmniIsaacGymEnvs
-# git clone https://github.com/boredengineering/Robots_for_Omniverse.git
+git clone https://github.com/boredengineering/Robots_for_Omniverse.git
 
 # install isaac-sim container and mount OIGE on it
 docker run --name isaac-sim-oige --entrypoint bash -it -d --gpus all -e "ACCEPT_EULA=Y" --network=host \
@@ -22,8 +22,9 @@ docker run --name isaac-sim-oige --entrypoint bash -it -d --gpus all -e "ACCEPT_
 -v ~/docker/isaac-sim/cache/kit:/isaac-sim/kit/cache/Kit:rw \
 public.ecr.aws/nvidia/isaac-sim:2022.2.1
 
-docker exec -it isaac-sim-oige sh -c "cd /workspace/omniisaacgymenvs && /isaac-sim/python.sh -m pip install -e . && cd omniisaacgymenvs"
+docker exec -it isaac-sim-oige sh -c "cd /workspace/omniisaacgymenvs && /isaac-sim/python.sh -m pip install -e ."
 # install OIGE on the Isaac-Sim Docker container - Not working for some reason
+# docker exec -it isaac-sim-oige sh -c "cd /workspace/omniisaacgymenvs && /isaac-sim/python.sh -m pip install -e . && cd omniisaacgymenvs"
 
 # -v ${PWD}/Robots_for_Omniverse:/workspace/Robots_for_Omniverse \
 # Can also get Docker from NGC
