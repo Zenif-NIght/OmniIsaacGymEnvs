@@ -54,12 +54,14 @@ class Go1(Robot):
         self._usd_path = usd_path
         self._name = name
 
-        if self._usd_path is None:
-            assets_root_path = get_assets_root_path()
-            if assets_root_path is None:
-                carb.log_error("Could not find nucleus server with /Isaac folder")
-            self._usd_path = assets_root_path + "/Isaac/Robots/ANYbotics/anymal_instanceable.usd"
-        add_reference_to_stage(self._usd_path, prim_path)
+        # if self._usd_path is None:
+        #     assets_root_path = get_assets_root_path()
+        #     if assets_root_path is None:
+        #         carb.log_error("Could not find nucleus server with /Isaac folder")
+        #     self._usd_path = assets_root_path + "/Isaac/Robots/ANYbotics/anymal_instanceable.usd"
+        # add_reference_to_stage(self._usd_path, prim_path)
+        assets_root_path = get_assets_root_path()
+        self._usd_path = assets_root_path + "/Isaac/Robots/Unitree/go1.usd"
 
         super().__init__(
             prim_path=prim_path,
@@ -69,18 +71,30 @@ class Go1(Robot):
             articulation_controller=None,
         )
 
-        self._dof_names = ["LF_HAA",
-                           "LH_HAA",
-                           "RF_HAA",
-                           "RH_HAA",
-                           "LF_HFE",
-                           "LH_HFE",
-                           "RF_HFE",
-                           "RH_HFE",
-                           "LF_KFE",
-                           "LH_KFE",
-                           "RF_KFE",
-                           "RH_KFE"]
+        # self._dof_names = ["LF_HAA",
+        #                    "LH_HAA",
+        #                    "RF_HAA",
+        #                    "RH_HAA",
+        #                    "LF_HFE",
+        #                    "LH_HFE",
+        #                    "RF_HFE",
+        #                    "RH_HFE",
+        #                    "LF_KFE",
+        #                    "LH_KFE",
+        #                    "RF_KFE",
+        #                    "RH_KFE"]
+        self._dof_names = ["FL_hip_joint",
+                        "RL_hip_joint",
+                        "FR_hip_joint",
+                        "RR_hip_joint",
+                        "FL_thigh_joint",
+                        "RL_thigh_joint",
+                        "FR_thigh_joint",
+                        "RR_thigh_joint",
+                        "FL_calf_joint",
+                        "RL_calf_joint",
+                        "FR_calf_joint",
+                        "RR_calf_joint"]
 
     @property
     def dof_names(self):
@@ -100,7 +114,7 @@ class Go1(Robot):
     def prepare_contacts(self, stage, prim):
         for link_prim in prim.GetChildren():
             if link_prim.HasAPI(PhysxSchema.PhysxRigidBodyAPI): 
-                if "_HIP" not in str(link_prim.GetPrimPath()):
+                if "_hip" not in str(link_prim.GetPrimPath()):
                     rb = PhysxSchema.PhysxRigidBodyAPI.Get(stage, link_prim.GetPrimPath())
                     rb.CreateSleepThresholdAttr().Set(0)
                     cr_api = PhysxSchema.PhysxContactReportAPI.Apply(link_prim)

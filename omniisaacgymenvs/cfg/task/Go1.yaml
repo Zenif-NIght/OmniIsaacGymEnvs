@@ -2,9 +2,9 @@
 name: Go1
 
 physics_engine: ${..physics_engine}
-# 4096
+
 env:
-  numEnvs: ${resolve_default:4,${...num_envs}}
+  numEnvs: ${resolve_default:200,${...num_envs}}
   envSpacing: 4.  # [m]
 
   clipObservations: 5.0
@@ -30,20 +30,21 @@ env:
     actionScale: 13.5
 
   defaultJointAngles:  # = target angles when action = 0.0
-    LF_HAA: 0.1    # [rad]
-    LH_HAA: 0.1    # [rad]
-    RF_HAA: -0.1   # [rad]
-    RH_HAA: -0.1   # [rad]
-
-    LF_HFE: 0.8     # [rad]
-    LH_HFE: -1.0    # [rad]
-    RF_HFE: 0.8     # [rad]
-    RH_HFE: -1.0    # [rad]
-
-    LF_KFE: -1.5    # [rad]
-    LH_KFE: -1.5     # [rad]
-    RF_KFE: -1.5    # [rad]
-    RH_KFE: -1.5    # [rad]
+  
+    FL_hip_joint: 0.1    # [rad]
+    RL_hip_joint: 0.1    # [rad]
+    FR_hip_joint: -0.1   # [rad]
+    RR_hip_joint: -0.1   # [rad]
+    
+    FL_thigh_joint: 0.8   # [rad]
+    RL_thigh_joint: 1.0  # [rad]
+    FR_thigh_joint: 0.8   # [rad]
+    RR_thigh_joint: 1.0   # [rad]
+    
+    FL_calf_joint: -1.5   # [rad]
+    RL_calf_joint: -1.5    # [rad]
+    FR_calf_joint: -1.5   # [rad]
+    RR_calf_joint: -1.5    # [rad]
 
   learn:
     # rewards
@@ -64,7 +65,7 @@ env:
     episodeLength_s: 50
 
 sim:
-  dt: 0.005
+  dt: 0.01 #0.005
   use_gpu_pipeline: ${eq:${...pipeline},"gpu"}
   gravity: [0.0, 0.0, -9.81]
   add_ground_plane: True
@@ -73,7 +74,7 @@ sim:
   disable_contact_processing: False
 
   # set to True if you use camera sensors in the environment
-  enable_cameras: False
+  enable_cameras: False #True
 
   default_physics_material:
     static_friction: 1.0
@@ -107,7 +108,7 @@ sim:
     gpu_temp_buffer_capacity: 33554432
     gpu_max_num_partitions: 8
 
-  Anymal:
+  Go1:
     # -1 to use default values
     override_usd_defaults: False
     enable_self_collisions: False
