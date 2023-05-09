@@ -26,7 +26,7 @@ provider "aws" {
 # NVIDIA Omniverse GPU-Optimized for running Isaac-Sim Container
 resource "aws_instance" "isaac_sim_oige" {
   # ami             = local.nvidia_ami
-  ami             = data.aws_ami_ids.nvidia_omniverse_ami.id
+  ami             = data.aws_ami_ids.nvidia_omniverse_ami.ids[0]
   instance_type   = local.instance_type
   key_name        = "isaac-sim-oige-key"
   user_data	      = file("isaac-sim-oige.sh")
