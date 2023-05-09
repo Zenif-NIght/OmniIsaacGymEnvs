@@ -124,10 +124,10 @@ class B1Task(RLTask):
         # Container Path /workspace/omniisaacgymenvs/Robots_for_Omniverse/openUSD_assets          
         anymal = B1(prim_path=self.default_zero_env_path + "/b1", 
                     name="B1",
-                    usd_path=relative_path, 
+                    usd_path=robot_path, 
                     translation=self._anymal_translation)
         self._sim_config.apply_articulation_settings("B1", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("B1"))
-
+        # "E:/Bored Engineer Github/Bored Engineer/Robots_for_Omniverse/openUSD_assets/UnitreeRobotics/b1/b1.usd"
         # Configure joint properties
         joint_paths = []
         for quadrant in ["LF", "LH", "RF", "RH"]:

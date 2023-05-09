@@ -25,8 +25,8 @@ provider "aws" {
 # Create the Instance
 # NVIDIA Omniverse GPU-Optimized for running Isaac-Sim Container
 resource "aws_instance" "isaac_sim_oige" {
-  ami             = local.nvidia_ami
-  # ami             = data.aws_ami.nvidia_omniverse_ami.id
+  # ami             = local.nvidia_ami
+  ami             = data.aws_ami_ids.nvidia_omniverse_ami.id
   instance_type   = local.instance_type
   key_name        = "isaac-sim-oige-key"
   user_data	      = file("isaac-sim-oige.sh")
@@ -59,28 +59,15 @@ resource "aws_instance" "isaac_sim_oige" {
 #---------------------------------------------------------------
 # Images - AMI
 #---------------------------------------------------------------
-# Returns Null, cannot find the AMI
-# data "aws_ami" "nvidia_omniverse_ami" {
-#   executable_users = ["self"]
-#   most_recent      = true
-#   owners           = ["aws-marketplace"]
+# Looking for NVIDIA Omniverse GPU-Optimized AMI
+data "aws_ami_ids" "nvidia_omniverse_ami" {
+  owners = ["aws-marketplace"]
 
-#   filter {
-#     name   = "name"
-#     values = ["NVIDIA Omniverse GPU-Optimized AMI"]
-#   }
-
-#   filter {
-#     name   = "root-device-type"
-#     values = ["ebs"]
-#   }
-
-#   filter {
-#     name   = "virtualization-type"
-#     values = ["hvm"]
-#   }
-# }
-
+  filter {
+    name   = "name"
+    values = ["OV AMI 1.3.6*"]
+  }
+}
 #---------------------------------------------------------------
 # List of Availability Zones in a Specific Region
 #---------------------------------------------------------------
@@ -222,14 +209,12 @@ resource "aws_default_route_table" "route_table" {
 #---------------------------------------------------------------
 # Output
 #---------------------------------------------------------------
-# output "ami_id" {
-#   value = data.aws_ami.nvidia_omniverse_ami.id
-# }
-# output "ami_name" {
-#   value = data.aws_ami.nvidia_omniverse_ami.name
-# }
+output "ami_id" {
+  value = data.aws_ami_ids.nvidia_omniverse_ami.ids
+}
+
 # Filtered Output: As the output is list now, get the first item from list (just for learning)
-# output "output_az" {
-#   value = keys({ for az, details in data.aws_ec2_instance_type_offerings.my_ins_type :
-#   az => details.instance_types if length(details.instance_types) != 0 })[0]
-# }
+output "output_az" {
+  value = keys({ for az, details in data.aws_ec2_instance_type_offerings.my_ins_type :
+  az => details.instance_types if length(details.instance_types) != 0 })[0]
+}

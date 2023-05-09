@@ -81,6 +81,9 @@ Verify created instance name
 - For accessing the Instance <br/>
 > ```ssh root@instance-public-Ipv4 -i isaac-sim-oige-key```
 
+- Find Nvidia AMI id <br/>
+> ```aws ec2 describe-images --owners aws-marketplace --filters "Name=name,Values=OV AMI 1.3.6*" --query 'Images[*].[ImageId]' --region us-east-1 --output table --profile profile-name```<br/>
+
 **Docker Commands:**<br/>
 - Start or Stop the Docker Container<br/>
 > ```docker start isaac-sim-oige```<br/>

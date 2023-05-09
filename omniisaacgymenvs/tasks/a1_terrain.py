@@ -222,7 +222,7 @@ class A1TerrainTask(RLTask):
         anymal_orientation = torch.tensor([1.0, 0.0, 0.0, 0.0])
         anymal = A1(prim_path=self.default_zero_env_path + "/a1", 
                         name="a1",
-                        usd_path=relative_path,
+                        usd_path=robot_path,
                         translation=anymal_translation, 
                         orientation=anymal_orientation,)
         self._sim_config.apply_articulation_settings("a1", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("a1"))

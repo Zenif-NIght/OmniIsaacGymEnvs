@@ -124,7 +124,7 @@ class Go1Task(RLTask):
         # Container Path /workspace/omniisaacgymenvs/Robots_for_Omniverse/openUSD_assets          
         anymal = Go1(prim_path=self.default_zero_env_path + "/go1", 
                       name="Go1",
-                      usd_path=relative_path, 
+                      usd_path=robot_path, 
                       translation=self._anymal_translation)
         self._sim_config.apply_articulation_settings("Go1", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("Go1"))
 

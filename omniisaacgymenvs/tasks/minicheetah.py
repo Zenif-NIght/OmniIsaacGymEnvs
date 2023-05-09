@@ -124,7 +124,7 @@ class MinicheetahTask(RLTask):
         # Container Path /workspace/omniisaacgymenvs/Robots_for_Omniverse/openUSD_assets        
         anymal = Minicheetah(prim_path=self.default_zero_env_path + "/minicheetah", 
                     name="Minicheetah",
-                    usd_path=relative_path, 
+                    usd_path=robot_path, 
                     translation=self._anymal_translation)
         self._sim_config.apply_articulation_settings("Minicheetah", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("Minicheetah"))
 
