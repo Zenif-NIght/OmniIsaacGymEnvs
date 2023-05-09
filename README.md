@@ -2,9 +2,13 @@
 
 ## About this repository </br>
 
-Modified by: Renan Monteiro Barbosa </br>
-New Branch </br>
-docker/run_docker.sh modified
+**Modified by:** </br>
+> Renan Monteiro Barbosa </br>
+
+Adds Cloud support through Terraform and enhanced Docker Scripts.</br>
+Adds More robot Examples, check [Robots_for_Omniverse
+](https://github.com/boredengineering/Robots_for_Omniverse) for the complete list of robots.</br>
+
 
 This repository contains Reinforcement Learning examples that can be run with the latest release of [Isaac Sim](https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/overview.html). RL examples are trained using PPO from [rl_games](https://github.com/Denys88/rl_games) library and examples are built on top of Isaac Sim's `omni.isaac.core` and `omni.isaac.gym` frameworks.
 

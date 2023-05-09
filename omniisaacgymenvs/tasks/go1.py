@@ -1,21 +1,45 @@
-from omni.isaac.core.utils.prims import get_prim_at_path, create_prim
+# Copyright (c) 2018-2022, NVIDIA Corporation
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived from
+#    this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+from omniisaacgymenvs.tasks.base.rl_task import RLTask
+from omniisaacgymenvs.robots.articulations.go1 import Go1
+from omniisaacgymenvs.robots.articulations.views.go1_view import Go1View
+from omniisaacgymenvs.tasks.utils.usd_utils import set_drive
+
+from omni.isaac.core.utils.prims import get_prim_at_path
+
 from omni.isaac.core.utils.torch.rotations import *
 
-from omniisaacgymenvs.robots.articulations.unitree import Unitree
-from omniisaacgymenvs.robots.articulations.views.unitree_view import UnitreeView
-from omniisaacgymenvs.tasks.utils.usd_utils import set_drive
-from omniisaacgymenvs.tasks.base.rl_task import RLTask
-from omni.kit.viewport.utility import get_active_viewport, get_viewport_from_window_name
-from omni.isaac.core.utils.viewports import set_camera_view
-from omni.isaac.synthetic_utils import SyntheticDataHelper
-
-import omni.kit.commands
-import omni.usd
-import omni.graph.core as og
 import numpy as np
 import torch
 import math
-
+import os
+from pathlib import Path
 
 class Go1Task(RLTask):
     def __init__(
@@ -73,54 +97,58 @@ class Go1Task(RLTask):
             self.rew_scales[key] *= self.dt
 
         self._num_envs = self._task_cfg["env"]["numEnvs"]
-        self._go1_translation = torch.tensor([0.0, 0.0, 0.32]) # 0.45
+        self._anymal_translation = torch.tensor([0.0, 0.0, 0.45])
         self._env_spacing = self._task_cfg["env"]["envSpacing"]
         self._num_observations = 48
         self._num_actions = 12
 
-        self._enable_cameras = self._task_cfg["sim"]["enable_cameras"]
-
         RLTask.__init__(self, name, env)
         return
-    
+
     def set_up_scene(self, scene) -> None:
-        self.get_go1()
+        self.get_anymal()
         super().set_up_scene(scene)
-        self._go1s = UnitreeView(prim_paths_expr="/World/envs/.*/Go1", name="Go1View")
-        print("Agents View created!")
-        scene.add(self._go1s)
-        scene.add(self._go1s._knees)
-        scene.add(self._go1s._base)
+        self._anymals = Go1View(prim_paths_expr="/World/envs/.*/go1", 
+                                 name="go1view")
+        scene.add(self._anymals)
+        scene.add(self._anymals._knees)
+        scene.add(self._anymals._base)
 
         return
-    
-    def get_go1(self):
-        go1 = Unitree(prim_path=self.default_zero_env_path + "/Go1", name="Go1", translation=self._go1_translation)
-        self._sim_config.apply_articulation_settings("Go1", get_prim_at_path(go1.prim_path), self._sim_config.parse_actor_config("Go1"))
-        print(go1.prim_path)
+
+    def get_anymal(self):
+        start = Path.cwd()
+        path = "/Robots_for_Omniverse/openUSD_assets/UnitreeRobotics/go1/go1.usd"
+        robot_path = str(start)[:-34].strip()+path
+        relative_path = os.path.relpath(robot_path, start)
+        # Container Path /workspace/omniisaacgymenvs/Robots_for_Omniverse/openUSD_assets          
+        anymal = Go1(prim_path=self.default_zero_env_path + "/go1", 
+                      name="Go1",
+                      usd_path=robot_path, 
+                      translation=self._anymal_translation)
+        self._sim_config.apply_articulation_settings("Go1", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("Go1"))
+
+        # Configure joint properties
         joint_paths = []
-        for quadrant in ["FL", "RL", "FR", "RR"]:
-            for parent, joint in [("hip", "thigh"), ("thigh", "calf")]:
-                joint_paths.append(f"{quadrant}_{parent}/{quadrant}_{joint}_joint")
-            joint_paths.append(f"trunk/{quadrant}_hip_joint")
-        
+        for quadrant in ["LF", "LH", "RF", "RH"]:
+            for component, abbrev in [("HIP", "H"), ("THIGH", "K")]:
+                joint_paths.append(f"{quadrant}_{component}/{quadrant}_{abbrev}FE")
+            joint_paths.append(f"base/{quadrant}_HAA")
         for joint_path in joint_paths:
-            set_drive(f"{go1.prim_path}/{joint_path}", "angular", "position", 0, self.Kp, self.Kd, 1000)
-        
+            set_drive(f"{anymal.prim_path}/{joint_path}", "angular", "position", 0, 400, 40, 1000)
+
         self.default_dof_pos = torch.zeros((self.num_envs, 12), dtype=torch.float, device=self.device, requires_grad=False)
-        dof_names = go1.dof_names
+        dof_names = anymal.dof_names
         for i in range(self.num_actions):
             name = dof_names[i]
             angle = self.named_default_joint_angles[name]
             self.default_dof_pos[:, i] = angle
 
-    
     def get_observations(self) -> dict:
-
-        torso_position, torso_rotation = self._go1s.get_world_poses(clone=False)
-        root_velocities = self._go1s.get_velocities(clone=False)
-        dof_pos = self._go1s.get_joint_positions(clone=False)
-        dof_vel = self._go1s.get_joint_velocities(clone=False)
+        torso_position, torso_rotation = self._anymals.get_world_poses(clone=False)
+        root_velocities = self._anymals.get_velocities(clone=False)
+        dof_pos = self._anymals.get_joint_positions(clone=False)
+        dof_vel = self._anymals.get_joint_velocities(clone=False)
 
         velocity = root_velocities[:, 0:3]
         ang_velocity = root_velocities[:, 3:6]
@@ -135,10 +163,6 @@ class Go1Task(RLTask):
             requires_grad=False,
             device=self.commands.device,
         )
-        
-        if self._enable_cameras:
-            camera_data = self.get_image()
-            print(camera_data[0]["rgb"])
 
         obs = torch.cat(
             (
@@ -155,28 +179,30 @@ class Go1Task(RLTask):
         self.obs_buf[:] = obs
 
         observations = {
-            self._go1s.name: {
+            self._anymals.name: {
                 "obs_buf": self.obs_buf
             }
         }
         return observations
-    
+
     def pre_physics_step(self, actions) -> None:
-        
+        if not self._env._world.is_playing():
+            return
+
         reset_env_ids = self.reset_buf.nonzero(as_tuple=False).squeeze(-1)
         if len(reset_env_ids) > 0:
             self.reset_idx(reset_env_ids)
 
-        indices = torch.arange(self._go1s.count, dtype=torch.int32, device=self._device)
+        indices = torch.arange(self._anymals.count, dtype=torch.int32, device=self._device)
         self.actions[:] = actions.clone().to(self._device)
         current_targets = self.current_targets + self.action_scale * self.actions * self.dt 
-        self.current_targets[:] = tensor_clamp(current_targets, self.go1_dof_lower_limits, self.go1_dof_upper_limits)
-        self._go1s.set_joint_position_targets(self.current_targets, indices)
+        self.current_targets[:] = tensor_clamp(current_targets, self.anymal_dof_lower_limits, self.anymal_dof_upper_limits)
+        self._anymals.set_joint_position_targets(self.current_targets, indices)
 
     def reset_idx(self, env_ids):
         num_resets = len(env_ids)
         # randomize DOF velocities
-        velocities = torch_rand_float(-0.1, 0.1, (num_resets, self._go1s.num_dof), device=self._device)
+        velocities = torch_rand_float(-0.1, 0.1, (num_resets, self._anymals.num_dof), device=self._device)
         dof_pos = self.default_dof_pos[env_ids]
         dof_vel = velocities
 
@@ -186,11 +212,11 @@ class Go1Task(RLTask):
 
         # apply resets
         indices = env_ids.to(dtype=torch.int32)
-        self._go1s.set_joint_positions(dof_pos, indices)
-        self._go1s.set_joint_velocities(dof_vel, indices)
+        self._anymals.set_joint_positions(dof_pos, indices)
+        self._anymals.set_joint_velocities(dof_vel, indices)
 
-        self._go1s.set_world_poses(self.initial_root_pos[env_ids].clone(), self.initial_root_rot[env_ids].clone(), indices)
-        self._go1s.set_velocities(root_vel, indices)
+        self._anymals.set_world_poses(self.initial_root_pos[env_ids].clone(), self.initial_root_rot[env_ids].clone(), indices)
+        self._anymals.set_velocities(root_vel, indices)
 
         self.commands_x[env_ids] = torch_rand_float(
             self.command_x_range[0], self.command_x_range[1], (num_resets, 1), device=self._device
@@ -209,22 +235,12 @@ class Go1Task(RLTask):
         self.last_dof_vel[env_ids] = 0.
 
     def post_reset(self):
-        
-        if self._enable_cameras:
-            self.viewports = []
-            for viewport_name in ["Viewport", "Viewport 0", "Viewport 1"]:
-                viewport_api = get_viewport_from_window_name(viewport_name)
-                self.viewports.append(viewport_api)
-            print('self.viewport:', self.viewports)
-            self.dockViewports()
-            
-    
-        self.initial_root_pos, self.initial_root_rot = self._go1s.get_world_poses()
+        self.initial_root_pos, self.initial_root_rot = self._anymals.get_world_poses()
         self.current_targets = self.default_dof_pos.clone()
 
-        dof_limits = self._go1s.get_dof_limits()
-        self.go1_dof_lower_limits = dof_limits[0, :, 0].to(device=self._device)
-        self.go1_dof_upper_limits = dof_limits[0, :, 1].to(device=self._device)
+        dof_limits = self._anymals.get_dof_limits()
+        self.anymal_dof_lower_limits = dof_limits[0, :, 0].to(device=self._device)
+        self.anymal_dof_upper_limits = dof_limits[0, :, 1].to(device=self._device)
 
         self.commands = torch.zeros(self._num_envs, 3, dtype=torch.float, device=self._device, requires_grad=False)
         self.commands_y = self.commands.view(self._num_envs, 3)[..., 1]
@@ -245,14 +261,14 @@ class Go1Task(RLTask):
         self.time_out_buf = torch.zeros_like(self.reset_buf)
 
         # randomize all envs
-        indices = torch.arange(self._go1s.count, dtype=torch.int64, device=self._device)
+        indices = torch.arange(self._anymals.count, dtype=torch.int64, device=self._device)
         self.reset_idx(indices)
 
     def calculate_metrics(self) -> None:
-        torso_position, torso_rotation = self._go1s.get_world_poses(clone=False)
-        root_velocities = self._go1s.get_velocities(clone=False)
-        dof_pos = self._go1s.get_joint_positions(clone=False)
-        dof_vel = self._go1s.get_joint_velocities(clone=False)
+        torso_position, torso_rotation = self._anymals.get_world_poses(clone=False)
+        root_velocities = self._anymals.get_velocities(clone=False)
+        dof_pos = self._anymals.get_joint_positions(clone=False)
+        dof_vel = self._anymals.get_joint_velocities(clone=False)
 
         velocity = root_velocities[:, 0:3]
         ang_velocity = root_velocities[:, 3:6]
@@ -263,8 +279,8 @@ class Go1Task(RLTask):
         # velocity tracking reward
         lin_vel_error = torch.sum(torch.square(self.commands[:, :2] - base_lin_vel[:, :2]), dim=1)
         ang_vel_error = torch.square(self.commands[:, 2] - base_ang_vel[:, 2])
-        rew_lin_vel_xy = torch.exp(-lin_vel_error/0.25) * self.rew_scales["lin_vel_xy"]
-        rew_ang_vel_z = torch.exp(-ang_vel_error/0.25) * self.rew_scales["ang_vel_z"]
+        rew_lin_vel_xy = torch.exp(-lin_vel_error / 0.25) * self.rew_scales["lin_vel_xy"]
+        rew_ang_vel_z = torch.exp(-ang_vel_error / 0.25) * self.rew_scales["ang_vel_z"]
 
         rew_lin_vel_z = torch.square(base_lin_vel[:, 2]) * self.rew_scales["lin_vel_z"]
         rew_joint_acc = torch.sum(torch.square(self.last_dof_vel - dof_vel), dim=1) * self.rew_scales["joint_acc"]
@@ -273,11 +289,11 @@ class Go1Task(RLTask):
 
         total_reward = rew_lin_vel_xy + rew_ang_vel_z + rew_joint_acc  + rew_action_rate + rew_cosmetic + rew_lin_vel_z
         total_reward = torch.clip(total_reward, 0.0, None)
-        
+
         self.last_actions[:] = self.actions[:]
         self.last_dof_vel[:] = dof_vel[:]
 
-        self.fallen_over = self._go1s.is_base_below_threshold(threshold=0.25, ground_heights=0.0)
+        self.fallen_over = self._anymals.is_base_below_threshold(threshold=0.51, ground_heights=0.0)
         total_reward[torch.nonzero(self.fallen_over)] = -1
         self.rew_buf[:] = total_reward.detach()
 
@@ -287,29 +303,3 @@ class Go1Task(RLTask):
         time_out = self.progress_buf >= self.max_episode_length - 1
         self.reset_buf[:] = time_out | self.fallen_over
 
-    
-    # def dockViewports(self) -> None:
-    #     """
-    #     [Summary]
-    
-    #     For instantiating and docking view ports
-    #     """
-    #     # first, set main viewport
-    #     main_viewport = get_active_viewport()
-    #     set_camera_view(eye=[3.0, 3.0, 3.0], target=[0, 0, 0], camera_prim_path="/OmniverseKit_Persp")
-
-    #     main_viewport = omni.ui.Workspace.get_window("Viewport")
-    #     left_camera_viewport = omni.ui.Workspace.get_window("Viewport 0")
-    #     right_camera_viewport = omni.ui.Workspace.get_window("Viewport 1")
-    #     if main_viewport is not None and left_camera_viewport is not None and right_camera_viewport is not None:
-    #         left_camera_viewport.dock_in(main_viewport, omni.ui.DockPosition.RIGHT, 2 / 3.0)
-    #         right_camera_viewport.dock_in(left_camera_viewport, omni.ui.DockPosition.RIGHT, 0.5)
-    
-    # def get_image(self) -> list:
-    #     # Get ground truths
-    #     sd_helper = SyntheticDataHelper()
-    #     gt_list = []
-    #     for viewport in self.viewports[1:]:
-    #         gt = sd_helper.get_groundtruth(["rgb"],viewport)
-    #         gt_list.append(gt)
-    #     return gt_list
