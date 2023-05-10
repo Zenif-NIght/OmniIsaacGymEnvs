@@ -12,43 +12,59 @@
 > - OIGE repo
 
 **Expected behaviour:**<br/>
-The Terraform script should create a private key on the terraform folder named isaac-sim-oige-private-key.pem and an AWS instance and attach a public Key Pair to it. It will use the [NVIDIA Omniverse GPU-Optimized AMI](https://aws.amazon.com/marketplace/pp/prodview-4gyborfkw4qjs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa) and will run the script (**isaac-sim-oige.sh**) to install an Isaac-Sim Docker Container with [OIGE](https://github.com/boredengineering/OmniIsaacGymEnvs.git) and [Robots_for_Omniverse](https://github.com/boredengineering/Robots_for_Omniverse) that contain robots ready to run on OIGE. <br/>
+The Terraform script should create a private key on the terraform folder named isaac-sim-oige-key.pem and an AWS instance and attach a public Key Pair to it. It will use the [NVIDIA Omniverse GPU-Optimized AMI](https://aws.amazon.com/marketplace/pp/prodview-4gyborfkw4qjs?sr=0-1&ref_=beagle&applicationId=AWSMPContessa) and will run the script (**isaac-sim-oige.sh**) to install an Isaac-Sim Docker Container with [OIGE](https://github.com/boredengineering/OmniIsaacGymEnvs.git) and [Robots_for_Omniverse](https://github.com/boredengineering/Robots_for_Omniverse) that contain robots ready to run on OIGE. <br/>
 
-Verify the github repo [Robots_for_Omniverse](https://github.com/boredengineering/Robots_for_Omniverse) for the list of robots.  <br/>
+Verify the github repo [Robots_for_Omniverse](https://github.com/boredengineering/Robots_for_Omniverse) for the list of available robots.  <br/>
 
 ## **Commands:**<br/>
 !!! Required to SSH into the instance. !!!<br/>
 You can also attach an existing Key-pair or manually create one.<br/>
 
 **Clone the OIGE Github repo**<br/>
-> git clone https://github.com/boredengineering/OmniIsaacGymEnvs.git<br/>
+> ```git clone https://github.com/boredengineering/OmniIsaacGymEnvs.git``` <br/>
 
 Then go to the folder OmniIsaacGymEnvs/terraform<br/>
-> cd OmniIsaacGymEnvs/terraform<br/>
+> ```cd ./OmniIsaacGymEnvs/terraform``` <br/>
 
 - Verify if AWS CLI works.<br/>
-> aws sso login --profile profile-name <br/>
+> ```aws sso login --profile profile-name``` <br/>
 
-If does not work check the AWS CLI Commands for instructions.<br/>
+If does not work check the section **AWS CLI Commands** for instructions.<br/>
+- For Linux<br/>
+```export AWS_PROFILE=my-aws-sso-profile```<br/>
+- For Windows<br/>
+```$Env:AWS_PROFILE = "my-aws-sso-profile"```<br/>
 
 **Terraform Commands:**<br/>
 - For Installing run:<br/>
-> terraform init<br/>
-> terraform plan<br/>
-> terraform apply<br/>
+> ```terraform init``` <br/>
+> ```terraform plan``` <br/>
+> ```terraform apply -auto-approve``` <br/>
 - For Deleting run:<br/>
-> terraform destroy<br/>
+> ```terraform destroy``` <br/>
 
 **SSH into the Instance**<br/>
+Verify the recently created Instance, for specific region add: **--region name-of-region**<br/>
+> ```aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Ipv4:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name``` <br/>
+
+Copy the Address of the Instance with the Correct Name (default is **isaac-sim-oige**).<br/>
 Once with the instance public-Ipv4 to connect you must run:<br/>
-> ssh root@instance-public-Ipv4 -i isaac-sim-oige-private-key
+> ```ssh -i "isaac-sim-oige-key.pem" root@instance-public-Ipv4```
+
+!!! Make sure a .pem key is created !!!<br/>
+!!! Attention !!! - powershell throws bad key error because the file is created with permission 755<br/>
+If on linux just run:<br/>
+> ```chmod 400 isaac-sim-oige-key.pem```<br/>
+
+If on Windows<br/>
+Need to convert to .ppk using Puttygen and use Putty to connect. The Windows ACLs dont make it easy to change permission<br/>
 
 **AWS CLI Commands:**<br/>
 - Verify if AWS CLI works.<br/>
-> aws sso login --profile my-dev-profile <br/>
+> ```aws sso login --profile my-dev-profile``` <br/>
 
 - If you cannot login, you probably have to configure your sso profile.<br/>
-> aws configure sso
+> ```aws configure sso```
 
 Should input on the terminal<br/>
 
@@ -60,42 +76,48 @@ Should input on the terminal<br/>
 
 Verify created instance name 
 - Describe Instances on a Region, if you need an specific region add: **--region name-of-region**<br/>
-> aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Address:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name <br/>
+> ```aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Ipv4:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name``` <br/>
 
 - For accessing the Instance <br/>
-> ssh stuff here
+> ```ssh root@instance-public-Ipv4 -i isaac-sim-oige-key```
+
+- Find Nvidia AMI id <br/>
+> ```aws ec2 describe-images --owners aws-marketplace --filters "Name=name,Values=OV AMI 1.3.6*" --query 'Images[*].[ImageId]' --region us-east-1 --output table --profile profile-name```<br/>
 
 **Docker Commands:**<br/>
 - Start or Stop the Docker Container<br/>
-> docker start isaac-sim-oige<br/>
-> docker stop isaac-sim-oige<br/>
+> ```docker start isaac-sim-oige```<br/>
+> ```docker stop isaac-sim-oige```<br/>
 
 - Verify running containers<br/>
-> docker ps<br/>
+> ```docker ps```<br/>
 - Verify all containers<br/>
-> docker ps -a<br/>
+> ```docker ps -a```<br/>
 
 - For connecting to the running Docker Container<br/>
-> docker exec -it -w /workspace/omniisaacgymenvs/omniisaacgymenvs isaac-sim-oige bash<br/>
+> ```docker exec -it -w /workspace/omniisaacgymenvs/omniisaacgymenvs isaac-sim-oige bash```<br/>
 
 
 
 ## **Setup AWS (Good practices)**
-A good safety practice is never to use the Root account on AWS. Therefore, it is reccomended to create a user with admin permissions.<br/>
+A good safety practice is never to use the Root Account on AWS. Therefore, it is reccomended to create a user with admin permissions.<br/>
 There are several ways to create an user, the most convenient way is to make a user with SSO access.<br/>
 
+
 **Login to the Dashboard as Root user:**<br/>
-- Go to IAM
-- Create a User Group
-- Create a User
+We gonna create an account which we will attach a User-Group from AWS SSO<br/>
+- Go to IAM<br/>
+- Create a User Group<br/>
+- Create a User and attach to the Group<br/>
+- Then attach permission policy to the group<br/>
 
 Then go to **AWS IAM Identity Center-(AWS SSO):**<br/>
-- Create a User
-- Create a Group
-- Add AWS account to the user in the group
-- Create and Apply a Permission set
-- Go to Settings —> Authentication
-- Create MFA ( Multi Factor Authentication )
+- Create a User<br/>
+- Create a Group<br/>
+- Add AWS account to the Group<br/>
+- Create and Apply a Permission set<br/>
+- Go to Settings —> Authentication<br/>
+- Create MFA ( Multi Factor Authentication )<br/>
 
 Now we can log on the AWS access portal URL:<br/>
 Example: https://--subdomain name--.awsapps.com/start<br/>
@@ -105,7 +127,7 @@ Now we can setup the AWS CLI with SSO<br/>
 
 ### **Configure AWS CLI**
 
-> aws configure sso
+> ```aws configure sso```
 
 Should input on the terminal<br/>
 
@@ -115,7 +137,7 @@ Should input on the terminal<br/>
 > SSO registration scopes [None]: sso:account:access<br/>
 
 For a default profile:<br/>
-> aws configure --profile= >profile-name< <br/>
+> ```aws configure --profile= profile-name``` <br/>
 
 Should input on the terminal<br/>
 
@@ -126,10 +148,10 @@ Should input on the terminal<br/>
 
 ## **Setup Terraform (Good practices)**
 **On windows, using Chocolatey**<br/>
-> choco install terraform
+> ```choco install terraform```
 
 Verify the installation<br/>
-> terraform -help
+> ```terraform -help```
 
 **On Windows, manual install**<br/>
 To install Terraform, find the (appropriate package)[https://developer.hashicorp.com/terraform/downloads] for your system and download it as a zip archive.<br/>
@@ -138,6 +160,13 @@ Finally, make sure that the **terraform** binary is available on your **PATH**. 
 
 [This Stack Overflow article contains instructions for setting the PATH on Windows through the user interface.](https://stackoverflow.com/questions/1618280/where-can-i-set-path-to-make-exe-on-windows)
 
+## Clean-Up
+
+> ```remove-item .terraform*```<br/>
+> ```remove-item terraform.tfstate*```<br/>
+> ```remove-item isaac-sim-oige-key.ppk```<br/>
+
+# **Appendix**
 ## **Github Repositories Used**
 Note: The official Nvidia repo of OIGE dont work out of the box.<br/>
 
@@ -168,9 +197,21 @@ Documentation Sources<br/>
 Vantage is a self-service cloud cost platform that gives developers the tools they need to analyze, report on and optimize AWS, Azure, and GCP costs.<br/>
 
 To filter instances of the specified type and only display their instance IDs, Availability Zone and the specified tag value in table format<br/>
-> aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Address:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name <br/>
+> ```aws ec2 describe-instances --filters Name=tag-key,Values=Name --query "Reservations[*].Instances[*].{Instance:InstanceId,AZ:Placement.AvailabilityZone,Address:PublicIpAddress,State:State.Name,Name:Tags[?Key=='Name']|[0].Value}" --output table --profile profile-name``` <br/>
 
 Get public ip of an instance<br/>
-> aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicIpAddress' -output text --profile profile-name <br/>
+> ```aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].PublicIpAddress' -output text --profile profile-name``` <br/>
 
 Note: can only get the Ip of running instances.
+
+```export AWS_PROFILE=my-aws-sso-profile```<br/>
+
+```$Env:AWS_PROFILE = "my-aws-sso-profile"```<br/>
+
+```aws ec2 describe-images --owners aws-marketplace --filters '[{"Name": "name", "Values": ["NVIDIA Omniverse GPU-Optimized AMI"]}, {"Name": "virtualization-type", "Values": ["hvm"]}, {"Name": "root-device-type", "Values": ["ebs"]}]' --query 'sort_by(Images, &CreationDate)[-1]' --region us-east-1 --output json```<br/>
+
+```aws ec2 describe-images --owners aws-marketplace --filters "Name=name,Values=NVIDIA Omniverse GPU-Optimized AMI" --query 'Images[*].[ImageId]' --region us-east-1 --output json```<br/>
+
+```aws ec2 describe-images --owners aws-marketplace --filters "Name=name,Values=NVIDIA Omniverse GPU-Optimized AMI" "Name=virtualization-type,Values=hvm" "Name=root-device-type,Values=ebs" --query 'Images[*].[ImageId]' --region us-east-1 --output json```<br/>
+
+

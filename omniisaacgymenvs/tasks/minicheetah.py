@@ -38,7 +38,8 @@ from omni.isaac.core.utils.torch.rotations import *
 import numpy as np
 import torch
 import math
-
+import os
+from pathlib import Path
 
 class MinicheetahTask(RLTask):
     def __init__(
@@ -116,9 +117,14 @@ class MinicheetahTask(RLTask):
         return
 
     def get_anymal(self):
+        start = Path.cwd()
+        path = "/Robots_for_Omniverse/openUSD_assets/mit_mini_cheetah/minicheetah/minicheetah.usd"
+        robot_path = str(start)[:-34].strip()+path
+        relative_path = os.path.relpath(robot_path, start)
+        # Container Path /workspace/omniisaacgymenvs/Robots_for_Omniverse/openUSD_assets        
         anymal = Minicheetah(prim_path=self.default_zero_env_path + "/minicheetah", 
                     name="Minicheetah",
-                    usd_path="/home/ctaw/Documents/GitHub/Robots_for_Omniverse/openUSD_assets/mit_mini_cheetah/minicheetah/minicheetah.usd", 
+                    usd_path=robot_path, 
                     translation=self._anymal_translation)
         self._sim_config.apply_articulation_settings("Minicheetah", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("Minicheetah"))
 
