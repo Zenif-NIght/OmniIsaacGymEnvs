@@ -115,20 +115,11 @@ class Go1Task(RLTask):
         scene.add(self._anymals._base)
 
         return
-
-    def get_anymal(self):
-        start = Path.cwd()
-        path = "/Robots_for_Omniverse/openUSD_assets/UnitreeRobotics/go1/go1.usd"
-        robot_path = str(start)[:-34].strip()+path
-        relative_path = os.path.relpath(robot_path, start)
-        # Container Path /workspace/omniisaacgymenvs/Robots_for_Omniverse/openUSD_assets          
-        anymal = Go1(prim_path=self.default_zero_env_path + "/go1", 
-                      name="Go1",
-                      usd_path=robot_path, 
-                      translation=self._anymal_translation)
-        self._sim_config.apply_articulation_settings("Go1", get_prim_at_path(anymal.prim_path), self._sim_config.parse_actor_config("Go1"))
-
-        # Configure joint properties
+    
+    def get_go1(self):
+        go1 = Unitree(prim_path=self.default_zero_env_path + "/Go1", name="Go1", translation=self._go1_translation)
+        self._sim_config.apply_articulation_settings("Go1", get_prim_at_path(go1.prim_path), self._sim_config.parse_actor_config("Go1"))
+        print(go1.prim_path)
         joint_paths = []
         for quadrant in ["LF", "LH", "RF", "RH"]:
             for component, abbrev in [("HIP", "H"), ("THIGH", "K")]:
