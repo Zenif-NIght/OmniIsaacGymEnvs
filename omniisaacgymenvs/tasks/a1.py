@@ -119,7 +119,14 @@ class A1Task(RLTask):
     def get_anymal(self):
         start = Path.cwd()
         path = "/Robots_for_Omniverse/openUSD_assets/UnitreeRobotics/a1/a1.usd"
-        robot_path = str(start)[:-34].strip()+path
+        if 'ROBOTS_FOR_OMNIVERSE_PATH' in os.environ:
+            value = os.environ.get('ROBOTS_FOR_OMNIVERSE_PATH')
+        else:
+            value = None
+        robot_path = value + path
+        # check if path exists
+        if not os.path.exists(robot_path):
+            raise Exception(f"🛑Path to robot {robot_path} does not exist")
         relative_path = os.path.relpath(robot_path, start)
         # Container Path /workspace/omniisaacgymenvs/Robots_for_Omniverse/openUSD_assets         
         anymal = A1(prim_path=self.default_zero_env_path + "/a1", 
