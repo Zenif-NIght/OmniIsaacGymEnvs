@@ -96,14 +96,15 @@ class Go1Task(RLTask):
         return
     
     def get_go1(self):
+        
         go1 = Unitree(prim_path=self.default_zero_env_path + "/Go1", name="Go1", translation=self._go1_translation)
         self._sim_config.apply_articulation_settings("Go1", get_prim_at_path(go1.prim_path), self._sim_config.parse_actor_config("Go1"))
         print(go1.prim_path)
         joint_paths = []
-        for quadrant in ["FL", "RL", "FR", "RR"]:
-            for parent, joint in [("hip", "thigh"), ("thigh", "calf")]:
-                joint_paths.append(f"{quadrant}_{parent}/{quadrant}_{joint}_joint")
-            joint_paths.append(f"trunk/{quadrant}_hip_joint")
+        for quadrant in ["LF", "LH", "RF", "RH"]:
+            for component, abbrev in [("HIP", "H"), ("THIGH", "K")]:
+                joint_paths.append(f"{quadrant}_{component}/{quadrant}_{abbrev}FE")
+            joint_paths.append(f"base/{quadrant}_HAA")
         
         for joint_path in joint_paths:
             set_drive(f"{go1.prim_path}/{joint_path}", "angular", "position", 0, self.Kp, self.Kd, 1000)

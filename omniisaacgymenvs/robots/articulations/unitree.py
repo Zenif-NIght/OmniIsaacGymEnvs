@@ -48,18 +48,18 @@ class Unitree(Robot):
             articulation_controller=None,
         )
 
-        self._dof_names = ["FL_hip_joint",
-                            "RL_hip_joint",
-                            "FR_hip_joint",
-                            "RR_hip_joint",
-                            "FL_thigh_joint",
-                            "RL_thigh_joint",
-                            "FR_thigh_joint",
-                            "RR_thigh_joint",
-                            "FL_calf_joint",
-                            "RL_calf_joint",
-                            "FR_calf_joint",
-                            "RR_calf_joint"]
+        self._dof_names = ["LF_HAA",
+                           "LH_HAA",
+                           "RF_HAA",
+                           "RH_HAA",
+                           "LF_HFE",
+                           "LH_HFE",
+                           "RF_HFE",
+                           "RH_HFE",
+                           "LF_KFE",
+                           "LH_KFE",
+                           "RF_KFE",
+                           "RH_KFE"]
         # self.image_width = 640
         # self.image_height = 480
 
@@ -147,7 +147,7 @@ class Unitree(Robot):
     def prepare_contacts(self, stage, prim):
         for link_prim in prim.GetChildren():
             if link_prim.HasAPI(PhysxSchema.PhysxRigidBodyAPI): 
-                if "_hip" not in str(link_prim.GetPrimPath()):
+                if "_HIP" not in str(link_prim.GetPrimPath()):
                     rb = PhysxSchema.PhysxRigidBodyAPI.Get(stage, link_prim.GetPrimPath())
                     rb.CreateSleepThresholdAttr().Set(0)
                     cr_api = PhysxSchema.PhysxContactReportAPI.Apply(link_prim)

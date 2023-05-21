@@ -31,20 +31,20 @@ env:
 
   defaultJointAngles:  # = target angles when action = 0.0
   
-    FL_hip_joint: 0.1    # [rad]
-    RL_hip_joint: 0.1    # [rad]
-    FR_hip_joint: -0.1   # [rad]
-    RR_hip_joint: -0.1   # [rad]
+    LF_HAA: 0.1    # [rad]
+    LH_HAA: 0.1    # [rad]
+    RF_HAA: -0.1   # [rad]
+    RH_HAA: -0.1   # [rad]
     
-    FL_thigh_joint: 0.8   # [rad]
-    RL_thigh_joint: 1.0  # [rad]
-    FR_thigh_joint: 0.8   # [rad]
-    RR_thigh_joint: 1.0   # [rad]
-    
-    FL_calf_joint: -1.5   # [rad]
-    RL_calf_joint: -1.5    # [rad]
-    FR_calf_joint: -1.5   # [rad]
-    RR_calf_joint: -1.5    # [rad]
+    LF_HFE: 0.8   # [rad]
+    LH_HFE: 1.0  # [rad]
+    RF_HFE: 0.8   # [rad]
+    RH_HFE: 1.0   # [rad]
+
+    LF_KFE: -1.5   # [rad]
+    LH_KFE: -1.5    # [rad]
+    RF_KFE: -1.5   # [rad]
+    RH_KFE: -1.5    # [rad]
 
   learn:
     # rewards
