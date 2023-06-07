@@ -61,7 +61,9 @@ class Go1(Robot):
         #     self._usd_path = assets_root_path + "/Isaac/Robots/ANYbotics/anymal_instanceable.usd"
         # add_reference_to_stage(self._usd_path, prim_path)
         assets_root_path = get_assets_root_path()
-        self._usd_path = assets_root_path + "/Isaac/Robots/Unitree/go1.usd"
+        # self._usd_path = assets_root_path + "/Isaac/Robots/Unitree/go1.usd"
+        # /home/ctaw/.local/share/ov/pkg/isaac_sim-2022.2.1/GO1_USD/go1_instanceable.usd
+        # self._usd_path = "/home/ctaw/.local/share/ov/pkg/isaac_sim-2022.2.1/GO1_USD/go1_instanceable.usd"
 
         super().__init__(
             prim_path=prim_path,

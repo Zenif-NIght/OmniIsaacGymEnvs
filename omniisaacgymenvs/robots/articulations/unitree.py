@@ -37,7 +37,9 @@ class Unitree(Robot):
             assets_root_path = get_assets_root_path()
             if assets_root_path is None:
                 carb.log_error("Could not find nucleus server with /Isaac folder")
-            self._usd_path = assets_root_path + "/Isaac/Robots/Unitree/go1.usd"
+            # self._usd_path = assets_root_path + "/Isaac/Robots/Unitree/go1.usd"
+            # /home/ctaw/.local/share/ov/pkg/isaac_sim-2022.2.1/GO1_USD/go1_instanceable.usd
+            self._usd_path = "/home/ctaw/.local/share/ov/pkg/isaac_sim-2022.2.1/GO1_USD/go1_instanceable.usd"
         add_reference_to_stage(self._usd_path, prim_path)
         
         super().__init__(
